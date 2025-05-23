@@ -3,7 +3,7 @@ services:
     image: chiaki-bot:latest
     container_name: chiakibot
     build:
-      context: ./simple-bot
+      context: ./chiaki-bot
       dockerfile: Dockerfile
     ports:
       - "3001:3001"

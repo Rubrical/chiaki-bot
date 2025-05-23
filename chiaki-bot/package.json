@@ -1,0 +1,45 @@
+{
+  "name": "simple-bot",
+  "version": "2.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:prod": "node src/index.js",
+    "dev": "tsx watch src/main.ts",
+    "build": "tsup src/main.ts --minify",
+    "start": "npm run build && node dist/main.js"
+  },
+  "keywords": [],
+  "author": "Filipe Salviano",
+  "description": "",
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/socket.io": "^3.0.2",
+    "@whiskeysockets/baileys": "^6.7.9",
+    "axios": "^1.7.9",
+    "canvas": "^2.11.2",
+    "chalk": "^4.0",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "file-type": "^16.5.3",
+    "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.2",
+    "fs-extra": "^11.3.0",
+    "human-readable": "^0.2.1",
+    "jimp": "^0.16.13",
+    "linkifyjs": "^4.2.0",
+    "node-cache": "^5.1.2",
+    "node-webpmux": "^3.2.1",
+    "qrcode-terminal": "^0.12.0",
+    "remove.bg": "^1.3.0",
+    "socket.io": "^4.8.1",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,37 @@
+<header>
+  <h2>Bem-Vindo ao Painel Administrativo do ChiakiBot!</h2>
+</header>
+
+<div class="auth-container">
+  <h2>{{ mode === 'login' ? 'Login' : 'Configuração inicial do ChiakiBot!' }}</h2>
+
+  <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+    <div class="form-group" *ngIf="mode === 'signup'">
+      <label for="name">Username</label>
+      <input type="text" id="name" formControlName="name">
+      <div class="error" *ngIf="authForm.get('name')?.invalid && authForm.get('name')?.touched">
+        Username é obrigatório
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="mode === 'login'">
+      <label for="name">Username</label>
+      <input type="text" id="name" formControlName="name">
+      <div class="error" *ngIf="authForm.get('name')?.invalid && authForm.get('name')?.touched">
+        Username é obrigatório
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" formControlName="password">
+      <div class="error" *ngIf="authForm.get('password')?.invalid && authForm.get('password')?.touched">
+        Password deve ter pelo menos 6 caracteres
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="authForm.invalid">
+      {{ mode === 'login' ? 'Entrar' : 'Criar conta' }}
+    </button>
+  </form>
+</div>

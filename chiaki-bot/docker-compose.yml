@@ -1,0 +1,25 @@
+services:
+  bot:
+    image: chiaki-bot:latest
+    build: .
+    environment:
+      - PREFIX=/
+      - BACKEND_URL=http://api:3000/api/
+    volumes:
+      - ./data:/app/session:rw
+      - ./data2:/app/logs:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+  api:
+    image: chiakibot-api:latest
+    container_name: chiakibot-api
+    ports:
+      - "3000:3000"
+    volumes:
+      - /home/lipian/projects/chiaki-bot-project/banco:/usr/src/app/database:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

@@ -1,0 +1,41 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Rank do Grupo</h2>
+
+    <table class="tabela">
+
+      <thead>
+        <tr>
+          <th>Colocação</th>
+          <th>Nome</th>
+          <th>Nº Mensagens</th>
+          <th>Nº Comandos</th>
+          <th>Número de whatsapp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rank of groupRank; index as i">
+          <td>{{ i + 1 }}º</td>
+          <td>{{ rank.nome }}</td>
+          <td>{{ rank.quantidadeMensagens }}</td>
+          <td>{{ rank.comandosExecutados }}</td>
+          <td>{{ rank.remoteJid }}</td>
+        </tr>
+      </tbody>
+
+    </table>
+    <div class="container mb-3 mt-1">
+      <label for="numberSelect" class="form-label">Selecionar número</label>
+      <select id="numberSelect" class="form-select" [(ngModel)]="numeroSelecionado" (change)="carregarRank()">
+        <option [ngValue]="1">1</option>
+        <option [ngValue]="2">2</option>
+        <option [ngValue]="5">5</option>
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="20">20</option>
+        <option [ngValue]="30">30</option>
+      </select>
+    </div>
+  </div>
+</div>

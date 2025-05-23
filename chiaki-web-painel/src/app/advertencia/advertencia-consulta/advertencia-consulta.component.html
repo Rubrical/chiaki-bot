@@ -1,0 +1,21 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Consulta de Advertência</h2>
+
+    <div *ngIf="advertence; else carregando">
+      <p><strong>ID:</strong> {{ advertence.id }}</p>
+      <p><strong>Nome do Grupo:</strong> {{ advertence.nomeGrupo }}</p>
+      <p><strong>Nome do Usuário:</strong> {{ advertence.nomeUsuario }}</p>
+      <p><strong>ID do Grupo WhatsApp:</strong> {{ advertence.idGrupoWhatsapp }}</p>
+      <p><strong>Usuário RemoteJid:</strong> {{ advertence.usuarioRemoteJid }}</p>
+      <p><strong>Motivo:</strong> {{ advertence.motivoAdvertencia }}</p>
+      <p><strong>Data da Última Advertência:</strong> {{ advertence.dataUltimaAdvertencia | date: 'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+
+    <ng-template #carregando>
+      <p>Carregando dados...</p>
+    </ng-template>
+  </div>
+</div>

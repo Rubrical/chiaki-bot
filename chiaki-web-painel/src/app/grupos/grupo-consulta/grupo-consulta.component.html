@@ -1,0 +1,126 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container gap-2">
+    <h2 class="titulo">
+      Grupo Consulta: {{ grupoConsulta?.groupName }}
+    </h2>
+    <div class="container mt-3 mb-3 p-4 gap-1">
+      <div class="container gap-2 p-3">
+        <h4>Informações Gerais</h4>
+
+        <div class="container">
+
+          <div class="row mt-1 mb-1 p-1">
+            <div class="col">
+              <p><strong>Nome:</strong> {{ grupoConsulta?.groupName }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Dono do Grupo:</strong> {{ grupoConsulta?.ownerName}}</p>
+            </div>
+            <div class="col">
+              <p><strong>Data Cadastro:</strong> {{ grupoConsulta?.dateEntry | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+
+          <div class="row mt-1 mb-1 p-1">
+            <div class="col">
+              <p><strong>Código do WhatsApp:</strong> {{ grupoConsulta?.whatsappGroupId }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Status:</strong> {{ grupoConsulta?.status ? 'Inativo' : 'Ativo' }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Quantia de Membros Ativos:</strong> {{ grupoConsulta?.totalActiveMembers}}</p>
+            </div>
+          </div>
+
+          <div class="row mt-1 mb-1 p-1">
+            <div class="col">
+              <p><strong>Quantia total de Membros:</strong> {{ grupoConsulta?.totalMembers }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Quantia de comandos executados:</strong> {{ grupoConsulta?.totalCommandsExecuted }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Quantia total de mensagens:</strong> {{ grupoConsulta?.totalMessagesNumber }}</p>
+            </div>
+          </div>
+
+          <div class="row mt-1 mb-1 p-1">
+            <div class="col">
+              <p><strong>Mensagem de boas vindas ativa?:</strong> {{ grupoConsulta?.isWelcomeMessageActive ? "Ativo" : "Inativo"}}</p>
+            </div>
+            <div class="col">
+              <p><strong>Mensagem de adeus ativa?:</strong> {{ grupoConsulta?.isGoodByeMessageActive ? "Ativo" : "Inativo"}}</p>
+            </div>
+          </div>
+
+        </div>
+
+
+        <hr>
+        <div class="container text-center p-2 mt-2 mb-1 gap-1">
+
+          <h4>Mensagens</h4>
+          <div class="row">
+            <div class="mb-4 col">
+              <h6><strong>Mensagem de boas-vindas</strong></h6>
+              <hr>
+              <div class="ps-3 border-start">
+                @if (welcomeMessage) {
+                  <p class="p-0 mt-0 mb-0"><strong>Status:</strong> {{ welcomeMessage.dataInativo ? "Inativo" : "Ativo" }}</p>
+                  <p class="p-0 mt-0 mb-0"><strong>Mensagem:</strong> {{ welcomeMessage.mensagem }}</p>
+                } @else {
+                  <p class="text-muted">Nenhuma mensagem de boas-vindas cadastrada</p>
+                }
+              </div>
+            </div>
+
+            <div class="mb-4 col">
+              <h6><strong>Mensagem de adeus</strong></h6>
+              <hr>
+              <div class="ps-3 border-start">
+                @if (goodbyeMessage) {
+                  <p class="p-0 mt-0 mb-0"><strong>Status:</strong> {{ goodbyeMessage.dataInativo ? "Inativo" : "Ativo" }}</p>
+                  <p class="p-0 mt-0 mb-0"><strong>Mensagem:</strong> {{ goodbyeMessage.mensagem }}</p>
+                } @else {
+                  <p class="text-muted">Nenhuma mensagem de adeus cadastrada</p>
+                }
+              </div>
+            </div>
+          </div>
+          <hr>
+
+          <h4>Usuários</h4>
+          <div class="row">
+            <div class="col container mb-4">
+              <h6><strong>Usuário lista</strong></h6>
+              <button class="btn btn-primary" (click)="goToGroupUserList()">Ver Lista de Usuários no grupo</button>
+            </div>
+
+            <div class="col container mb-4">
+              <h6><strong>Rank Grupo</strong></h6>
+              <button class="btn btn-primary" (click)="goToRank()">Ver Rank do grupo</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col container mb-4">
+              <h6><strong>Banimentos</strong></h6>
+              <button class="btn btn-primary" (click)="goToBans()">Ver banimentos do grupo</button>
+            </div>
+            <div class="col container mb-4">
+              <h6><strong>Advertências</strong></h6>
+              <button class="btn btn-primary" (click)="goToAdvertences()">Ver Advertências do grupo</button>
+            </div>
+          </div>
+
+          <hr>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="container main-container">
+  <h1>Bem-vindo! {{ ownerName }}</h1>
+  <div class="buttons-container">
+    @for (link of navigationLinks; track $index) {
+      <button class="btn btn-primary"  (click)="navigateTo(link.route)">{{ link.label }}</button>
+    }
+  </div>
+</div>

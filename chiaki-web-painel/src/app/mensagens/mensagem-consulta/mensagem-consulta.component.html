@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Consulta de Mensagem</h2>
+    <div class="container d-flex gap-2">
+      <button class="btn btn-success mb-3" [routerLink]="['/mensagens/mensagem-formulario', this.message.chaveMensagem]">
+        Editar Mensagem
+      </button>
+      <button class="btn btn-secondary mb-3" (click)="changeStatus()">
+        {{ message.dataInativo ? 'Ativar' : 'Inativar' }}
+      </button>
+
+    </div>
+    <div *ngIf="message">
+      <div class="row">
+        <div class="col">
+          <p><strong>ID:</strong> {{ message.id }}</p>
+        </div>
+        <div class="col">
+          <p><strong>Código:</strong> {{ message.chaveMensagem }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p><strong>Mensagem:</strong> {{ message.mensagem }}</p>
+        </div>
+        <div class="col">
+          <p><strong>Data Cadastro:</strong> {{ message.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="col" *ngIf="message.dataInativo">
+          <p><strong>Data Inativo:</strong> {{ message.dataInativo | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="message.midia">
+        <p><strong>Mídia:</strong></p>
+
+        <div class="d-flex flex-column gap-2">
+          <button class="btn btn-primary align-self-start" (click)="toggleImage(message.midia)">
+            {{ showImage ? 'Ocultar Imagem' : 'Mostrar Imagem' }}
+          </button>
+
+          <img *ngIf="showImage && imageUrl"
+              [src]="imageUrl"
+              alt="Imagem da Mensagem"
+              class="img-fluid rounded border p-1">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

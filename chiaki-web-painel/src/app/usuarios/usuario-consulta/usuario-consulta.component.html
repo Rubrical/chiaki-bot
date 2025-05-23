@@ -1,0 +1,79 @@
+<div class="container mt-4">
+  <app-voltar />
+  <div class="painel-container gap-2">
+    <h2 class="titulo">
+      Usuário consulta
+    </h2>
+    <div class="container mt-3 mb-3 p-4 gap-1">
+       <div class="container gap-2 p-3">
+        <h4>Informações Gerais</h4>
+        <div class="container">
+
+          <div class="row">
+            <div class="col">
+              <p><strong>Nome: </strong>{{ usuarioReport?.nome}}</p>
+            </div>
+            <div class="col">
+              <p><strong>Número WhatsApp:</strong> {{ usuarioReport?.remoteJid }}</p>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col">
+              <p><strong>Quantidade grupos participantes: </strong>{{ usuarioReport?.quantidadeGruposParticipa }}</p>
+            </div>
+            <div class="col">
+              <p><strong>Data Cadastro:</strong> {{ usuarioReport?.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <button class="btn btn-primary btn-sm" (click)="consultarAdvertencias()">
+                Consultar Bans
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <hr>
+
+        <h4 (click)="alternarExibirGrupos()" style="cursor: pointer;">
+          Grupo participantes
+          <span *ngIf="!exibirGrupos">[+]</span>
+          <span *ngIf="exibirGrupos">[-]</span>
+        </h4>
+
+        <div [@expandCollapse]="exibirGrupos ? 'expanded' : 'collapsed'">
+          <div *ngIf="usuarioReport?.gruposParticipantes?.length; else nenhumGrupo">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Nome Grupo</th>
+                  <th>Id WhatsApp</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let grupo of usuarioReport?.gruposParticipantes">
+                  <td>{{ grupo.nomeGrupo }}</td>
+                  <td>{{ grupo.grupoRemoteJid }}</td>
+                  <td>{{ grupo.estadoGrupo ? 'Ativo' : 'Inativo' }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" (click)="consultarGrupo(grupo.grupoRemoteJid)">
+                      Consultar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #nenhumGrupo>
+            <p>Nenhum grupo participante encontrado.</p>
+          </ng-template>
+        </div>
+       </div>
+       <div class="container gap-2 p-3"></div>
+    </div>
+  </div>
+</div>

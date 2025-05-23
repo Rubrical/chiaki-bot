@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Advertência Lista</h2>
+
+    <table class="tabela">
+
+      <thead>
+        <tr>
+          <th>Nome do Grupo</th>
+          <th>Nome do usuário</th>
+          <th>Data de Registro</th>
+          <th>Consultar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let adv of advertencesList">
+          <td>{{ adv.nomeGrupo }}</td>
+          <td>{{ adv.nomeUsuario }}</td>
+          <td>{{ adv.dataUltimaAdvertencia | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <button class="btn btn-outline-primary btn-sm" title="Consultar" (click)="consult(adv.id!)">
+              <i class="bi bi-search"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+
+    <nav class="paginacao">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="pageNumber === 1">
+          <a class="page-link pointer" (click)="loadPage(pageNumber - 1)">Anterior</a>
+        </li>
+
+        <li class="page-item"
+            *ngFor="let page of [].constructor(totalPages); let i = index"
+            [class.active]="pageNumber === (i + 1)">
+          <a class="page-link pointer" (click)="loadPage(i + 1)">{{ i + 1 }}</a>
+        </li>
+
+        <li class="page-item" [class.disabled]="pageNumber === totalPages">
+          <a class="page-link pointer pointer" (click)="loadPage(pageNumber + 1)">Próxima</a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+</div>

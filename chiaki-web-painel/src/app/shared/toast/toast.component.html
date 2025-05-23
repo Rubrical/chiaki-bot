@@ -1,0 +1,19 @@
+<div class="position-fixed bottom-0 end-0 p-3 m-2" style="z-index: 1055">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast {{ toastClass(toast.type) }} show m-2"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    [@fadeSlide]
+  >
+    <div class="toast-body d-flex p-3 m-1">
+      <p class="m-0 p-0">{{ toast.message }}</p>
+      <button
+        type="button"
+        class="btn-close btn-close-white ms-auto"
+        (click)="remove(toast.id)"
+      ></button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <app-voltar />
+  <div class="painel-container gap-2">
+
+    <h2 class="titulo">Ban consulta</h2>
+    <div class="container mt-3 mb-3 p-4 gap-1">
+       <div class="container gap-2 p-3">
+          <h4>Informações Gerais</h4>
+          <div class="container">
+
+            <div class="row">
+              <div class="col">
+                <p><strong>Código: </strong>{{ ban?.id }}</p>
+              </div>
+              <div class="col">
+                <p><strong>Número de WhatsApp: </strong>{{ ban?.userRemoteJid }}</p>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <p><strong>Data Cadastro: </strong>{{ ban?.dataCadastro | date: 'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+              <div class="col" *ngIf="ban?.dataInativo">
+                <p><strong>Data Inativo:</strong> {{ ban?.dataInativo | date: 'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+              <div class="col">
+                <p><strong>Status: </strong>{{ ban?.dataInativo ? "Inativo" : "Ativo"}}</p>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <p><strong>Motivo ban: </strong>{{ ban?.motivoBan }}</p>
+              </div>
+            </div>
+
+          </div>
+          <button class="justify-content-center btn btn-danger" (click)="removeBan()">Remover ban</button>
+        </div>
+
+    </div>
+
+  </div>
+</div>

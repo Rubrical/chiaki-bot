@@ -1,0 +1,15 @@
+<app-voltar />
+
+<div class="container qr-wrapper">
+  @if (isConnected) {
+    @if (qrCode) {
+      <h2>Escaneie o código</h2>
+      <img [src]="qrImageUrl" class="qr-image" alt="QR Code">
+    } @else {
+      <h2>Aguardando QR Code...</h2>
+      <p>Verifique se o sistema está pronto para gerar o código.</p>
+    }
+  } @else {
+    <h2>Bot Conectado</h2>
+  }
+</div>

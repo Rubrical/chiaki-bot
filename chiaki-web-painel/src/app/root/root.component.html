@@ -1,0 +1,24 @@
+<app-voltar />
+<div class="auth-container">
+  <form [formGroup]="authForm" (ngSubmit)="updateRoot()">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" formControlName="username">
+      <div class="error" *ngIf="authForm.get('username')?.invalid && authForm.get('username')?.touched">
+        Username é obrigatório
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" formControlName="password">
+      <div class="error" *ngIf="authForm.get('password')?.invalid && authForm.get('password')?.touched">
+        Password deve ter pelo menos 6 caracteres
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="authForm.invalid">
+      Atualizar dados
+    </button>
+  </form>
+</div>

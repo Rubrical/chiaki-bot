@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Advertências do Grupo</h2>
+
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Nome do Grupo</th>
+          <th>Nome do Usuário</th>
+          <th>Data de Registro</th>
+           <th>Consultar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let adv of advertencesList">
+          <td>{{ adv.nomeGrupo }}</td>
+          <td>{{ adv.nomeUsuario }}</td>
+          <td>{{ adv.dataUltimaAdvertencia | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <button class="btn btn-outline-primary btn-sm" title="Consultar" (click)="consult(adv.id!)">
+              <i class="bi bi-search"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

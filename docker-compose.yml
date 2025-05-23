@@ -1,0 +1,45 @@
+services:
+  chiakibot:
+    image: chiaki-bot:latest
+    container_name: chiakibot
+    build:
+      context: ./simple-bot
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    environment:
+      - PREFIX=/
+      - BACKEND_URL=http://api:3000/api/
+    volumes:
+      - ./sessao:/app/session:rw
+      - ./logs:/app/logs:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    restart: always
+
+  api:
+    image: chiakibot-api:latest
+    container_name: chiakibot-api
+    build:
+      context: ./ChiakiBot-API
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./banco:/usr/src/app/database:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  chiaki-web-panel:
+    image: chiaki-web-painel
+    container_name: chiaki-web-painel
+    build:
+      context: ./chiaki-web-painel
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    restart: always

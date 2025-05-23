@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <app-voltar />
+
+  <div class="painel-container">
+    <h2 class="titulo">Grupos Lista</h2>
+    <p class="mx-2 px-2 mt-3 d-flex justify-content-between">Grupos em que estou: <strong>{{ groupsNumber }}</strong></p>
+
+    <table class="tabela">
+
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nome do Grupo</th>
+          <th>Data de Registro</th>
+          <th>Status</th>
+          <th>Consultar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let group of groupList">
+          <td>{{ group.id }}</td>
+          <td>{{ group.groupName }}</td>
+          <td>{{ group.dateEntry | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span>
+              {{ group.isActive ? 'Inativo' : 'Ativo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-outline-primary btn-sm" title="Consultar" (click)="consult(group.whatsappGroupId!)">
+              <i class="bi bi-search"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+
+    <nav class="paginacao">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="pageNumber === 1">
+          <a class="page-link pointer" (click)="loadPage(pageNumber - 1)">Anterior</a>
+        </li>
+
+        <li class="page-item"
+            *ngFor="let page of [].constructor(totalPages); let i = index"
+            [class.active]="pageNumber === (i + 1)">
+          <a class="page-link pointer" (click)="loadPage(i + 1)">{{ i + 1 }}</a>
+        </li>
+
+        <li class="page-item" [class.disabled]="pageNumber === totalPages">
+          <a class="page-link pointer pointer" (click)="loadPage(pageNumber + 1)">Próxima</a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+</div>

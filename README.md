@@ -39,6 +39,12 @@ Chiaki é uma solução simplificada de automação para WhatsApp, composta por 
 3. Execute-o com `docker compose up --build -d`
 > Obs: Do jeito que está o painel web deve funcionar sem nenhum problema. Mas caso hajam problemas com o ambiente do painel web vá até `/chiaki-web-painel/src/environments/environment.ts`.
 
+# Comandos de exemplo:
+- `menu`: Mostra todas as funcionalidades do bot
+- `s`: Cria uma figurinha ao marcar ou enviar ou uma foto, ou gif ou vídeo curto
+-  `msg-status`: Verifica o status das mensagens de boas-vindas e adeus, que são ativadas ao evento de entrada e saída de membros de um grupo
+-  `rank`: Mostra o rank dos usuários com mais mensagens em um grupo  
+
 ## 📬 Contato
 Em caso de dúvidas, sugestões ou problemas, entre em contato:
 Filipe – [filipesalviano@proton.me]

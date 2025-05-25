@@ -26,7 +26,6 @@ export class QrcodeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.socket.on("connect", () => {
       this.isConnected = true;
-
     });
 
     this.socket.on("disconnect", () => {
@@ -37,7 +36,6 @@ export class QrcodeComponent implements OnInit, OnDestroy {
       this.isConnected = false;
       this.socket.disconnect();
 
-      // this.openToast("Erro ao se comunicar com o servidor", "error");
       this.toastService.error("Erro ao se comunicar com o servidor", 8000);
     });
 

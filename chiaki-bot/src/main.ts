@@ -1,4 +1,3 @@
-import "./servers/web-server";
 import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
 import P from 'pino';
 import logger from './logger';
@@ -10,7 +9,6 @@ import { MessageUpsertEvent } from './events/messages-upsert-event';
 import { GroupsUpsert } from './events/groups-upsert-event';
 import { GroupsUpdate } from './events/groups-update-event';
 import { AdvertenceService } from './services/advertence-service';
-import { io, startWebSocket, stopWebSocket } from './servers/web-socket';
 
 function getConfig(): ChiakiConfig {
     return {
@@ -26,8 +24,8 @@ const start = async (): Promise<ChiakiClient | void> => {
     const client = makeWASocket({
         auth: state,
         logger: P({ level: 'silent' }),
-        printQRInTerminal: true,
         qrTimeout: 20 * 1000,
+        shouldSyncHistoryMessage: () => false,
     }) as ChiakiClient;
 
     client.utils = utils;
@@ -35,9 +33,9 @@ const start = async (): Promise<ChiakiClient | void> => {
     client.cmd = new Map();
     client.log = logger;
 
-    const isInstalled = client.utils.verifyIfFFMPEGisInstalled();
+    const isInstalled = await client.utils.verifyIfFFMPEGisInstalled();
     if (!isInstalled) {
-        logger.warn('O FFMPEG não está instalado, instále-o!');
+        logger.warn('O FFMPEG não está instalado, instale-o!');
         return;
     }
 

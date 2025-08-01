@@ -14,7 +14,7 @@
   "dependencies": {
     "@types/cors": "^2.8.17",
     "@types/socket.io": "^3.0.2",
-    "@whiskeysockets/baileys": "^6.7.9",
+    "@whiskeysockets/baileys": "^6.7.18",
     "axios": "^1.7.9",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

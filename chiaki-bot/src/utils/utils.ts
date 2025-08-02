@@ -40,3 +40,5 @@ export const validateRemoteJid = (remoteJid: string): JidInfo => {
 
   return { phoneNumber: phoneNumber, type: JidType.UNKNOWN };
 }
+
+export const getExtensionFromUrl = (url: string): string => url.split(".").pop()?.toLowerCase() || "";

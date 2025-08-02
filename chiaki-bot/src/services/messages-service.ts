@@ -38,7 +38,7 @@ export const MessageService = {
     },
     getMedia: async (codeMessage: string) => {
         return await api.get(routes.getMedia(codeMessage), { responseType: 'arraybuffer' })
-            .then((data) =>  data)
+            .then((data: Buffer) =>  data)
             .catch((err) => logger.error(err))
     }
 }

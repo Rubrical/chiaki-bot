@@ -36,19 +36,47 @@ const chance: IChiakiCommand = {
       .replace("{PERCENTAGE}", `${percentage}`);
 
     const media = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+    const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
+
+    console.log(media);
+
+    let mediaPayload: any;
+
+    if (media) {
+      if (ext === "gif") {
+        mediaPayload = {
+          gifPlayback: true,
+          video: media,
+          caption: text,
+          mimetype: "image/gif",
+        };
+      } else {
+        mediaPayload = {
+          image: media,
+          caption: text,
+        };
+      }
+    } else {
+      mediaPayload = {text};
+    }
 
     try {
       await client.sendMessage(
         M.from,
         {
-          ...(media ? { image: media, caption: text } : { text }),
+          ...mediaPayload,
           mentions: [M.sender],
         },
-        { quoted: M }
+        {
+          quoted: M
+        }
       );
-    } catch(err) {
+    } catch (err) {
       const now = new Date(Date.now());
-      await client.sendMessage(M.from, { text: `Um erro inesperado ocorreu!\n Servidor interno fora do ar ou outro erro.\n Horário do erro ${now.toString()}`});
+      await client.sendMessage(M.from,
+        {
+          text: `Um erro inesperado ocorreu!\n Servidor interno fora do ar ou outro erro.\n Horário do erro ${now.toString()}`
+        });
       client.log.error(`${JSON.stringify(err)}`);
     }
   },

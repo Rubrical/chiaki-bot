@@ -4,7 +4,7 @@
   <div class="painel-container">
     <h2 class="titulo">Consulta de Mensagem</h2>
     <div class="container d-flex gap-2">
-      <button class="btn btn-success mb-3" [routerLink]="['/mensagens/mensagem-formulario', this.message.chaveMensagem]">
+      <button class="btn btn-success mb-3" [routerLink]="['/mensagens/mensagem-formulario', chaveMensagem]">
         Editar Mensagem
       </button>
       <button class="btn btn-secondary mb-3" (click)="changeStatus()">
@@ -41,10 +41,26 @@
             {{ showImage ? 'Ocultar Imagem' : 'Mostrar Imagem' }}
           </button>
 
-          <img *ngIf="showImage && imageUrl"
-              [src]="imageUrl"
-              alt="Imagem da Mensagem"
-              class="img-fluid rounded border p-1">
+          <div class="container d-flex justify-content-center my-3">
+            <img *ngIf="showImage && imageUrl && mediaType === 'image'"
+                 [ngSrc]="imageUrl"
+                 width="800"
+                 height="600"
+                 alt="Imagem da Mensagem"
+                 class="img-fluid rounded border p-1">
+
+            <video *ngIf="showImage && imageUrl && mediaType === 'video'"
+                   [src]="imageUrl"
+                   width="800"
+                   height="600"
+                   autoplay
+                   muted
+                   loop
+                   playsinline
+                   class="img-fluid rounded border p-1">
+            </video>
+          </div>
+
         </div>
       </div>
     </div>

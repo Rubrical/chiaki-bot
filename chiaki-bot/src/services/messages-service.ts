@@ -3,6 +3,7 @@ import { Message } from "../types/domain";
 import { ChiakiError } from "../types/ChiakiError";
 import logger from "../logger";
 import FormData from "form-data";
+import { Buffer } from "node:buffer";
 
 const url = "messages";
 const routes = {
@@ -37,9 +38,13 @@ export const MessageService = {
             });
     },
     getMedia: async (codeMessage: string) => {
-        return await api.get(routes.getMedia(codeMessage), { responseType: 'arraybuffer' })
-            .then((data: Buffer) =>  data)
-            .catch((err) => logger.error(err))
+      try {
+        const response = await api.get(routes.getMedia(codeMessage), { responseType: 'arraybuffer' });
+        return Buffer.from(response);
+      } catch (err) {
+        logger.error("Erro ao resgatar mídia: " + JSON.stringify(err));
+        return null;
+      }
     }
 }
 

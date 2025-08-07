@@ -38,17 +38,14 @@ const chance: IChiakiCommand = {
     const media = msg.midia ? await MessageService.getMedia(msg.midia) : null;
     const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
 
-    console.log(media);
-
     let mediaPayload: any;
 
     if (media) {
-      if (ext === "gif") {
+      if (ext === "mp4") {
         mediaPayload = {
           gifPlayback: true,
           video: media,
           caption: text,
-          mimetype: "image/gif",
         };
       } else {
         mediaPayload = {

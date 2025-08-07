@@ -20,8 +20,8 @@ import { diskStorage } from 'multer';
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/image\/(jpeg|jpg|png|gif)/)) {
-          return cb(new BadRequestException('Apenas imagens e gifs são permitidos'), false);
+        if (!file.mimetype.match(/image\/(jpeg|jpg|png)|video\/mp4/)) {
+          return cb(new BadRequestException('Apenas .png, .jpeg, .jpg e .mp4 são permitidos'), false);
         }
 
         cb(null, true);

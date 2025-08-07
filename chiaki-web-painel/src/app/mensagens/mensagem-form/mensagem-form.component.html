@@ -23,7 +23,7 @@
     <!-- Apenas para edição -->
     <div *ngIf="isEdit" class="mt-4">
       <h4>Anexar Mídia</h4>
-      <input class="" type="file" (change)="onFileSelected($event)" accept="image/jpeg, image/png, image/jpg, image/gif">
+      <input class="" type="file" (change)="onFileSelected($event)" accept="image/jpeg, image/png, image/jpg, video/mp4">
       <button class="btn btn-primary mt-2" (click)="uploadFile()">Enviar Mídia</button>
     </div>
   </div>

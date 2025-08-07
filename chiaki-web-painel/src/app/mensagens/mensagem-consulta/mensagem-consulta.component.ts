@@ -3,13 +3,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Message } from '../../shared/models/message';
 import { MessagesService } from '../../shared/services/messages.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import { VoltarComponent } from '../../shared/voltar/voltar.component';
 
 @Component({
   selector: 'app-mensagem-consulta',
   standalone: true,
-  imports: [CommonModule, VoltarComponent, RouterLink],
+  imports: [CommonModule, VoltarComponent, RouterLink, NgOptimizedImage],
   templateUrl: './mensagem-consulta.component.html',
   styleUrl: './mensagem-consulta.component.sass'
 })
@@ -17,6 +17,8 @@ export class MensagemConsultaComponent implements OnInit {
   message!: Message;
   imageUrl: string | null = null;
   showImage = false;
+  chaveMensagem?: string;
+  mediaType: 'image' | 'video' | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,10 +45,20 @@ export class MensagemConsultaComponent implements OnInit {
     }
   }
 
-  loadImage(fileName: string): void {
+  private loadImage(fileName: string): void {
     this.messagesService.getMedia(fileName).subscribe({
       next: (blob) => {
         this.imageUrl = URL.createObjectURL(blob);
+
+        if (blob.type.startsWith('video')) {
+          this.mediaType = 'video';
+        } else if (blob.type.startsWith('image')) {
+          this.mediaType = 'image';
+        } else {
+          this.mediaType = null;
+          this.imageUrl = null;
+          this.toastService.warning('Tipo de mídia não suportado.');
+        }
       },
       error: (err) => {
         console.error('Erro ao carregar a imagem:', err);
@@ -58,16 +70,10 @@ export class MensagemConsultaComponent implements OnInit {
     if (this.showImage) {
       this.showImage = false;
       this.imageUrl = null;
+      this.mediaType = null;
     } else {
-      this.messagesService.getMedia(fileName).subscribe({
-        next: (blob) => {
-          this.imageUrl = URL.createObjectURL(blob);
-          this.showImage = true;
-        },
-        error: (err) => {
-          console.error('Erro ao carregar a imagem:', err);
-        }
-      });
+      this.loadImage(fileName);
+      this.showImage = true;
     }
   }
 
@@ -76,10 +82,13 @@ export class MensagemConsultaComponent implements OnInit {
     if (this.message.dataInativo) {
       this.messagesService.reactivate(this.message.id!).subscribe({
         next: res => {
-          console.log(res);
+          if (!res) {
+            this.toastService.warning('Houve um erro ao reativar a mensagem. Tente novamente mais tarde.', 1500);
+            return;
+          }
+
           this.toastService.success('Mensagem reativada com sucesso!', 1500);
           this.location.back();
-          console.log(this.location.getState());
         },
         error: err => {
           console.error(err);
@@ -93,7 +102,11 @@ export class MensagemConsultaComponent implements OnInit {
     } else {
       this.messagesService.deactivate(this.message.id!).subscribe({
         next: res => {
-          console.log(res);
+          if (!res) {
+            this.toastService.warning('Houve um erro ao desativar a mensagem. Tente novamente mais tarde.', 1500);
+            return;
+          }
+
           this.toastService.success('Mensagem desativada com sucesso!', 1500);
           this.location.back();
         },

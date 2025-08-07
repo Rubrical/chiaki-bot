@@ -14,7 +14,7 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   StreamableFile,
-  NotFoundException,
+  NotFoundException, BadRequestException,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -24,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as process from 'node:process';
+import * as mime from 'mime-types';
 
 @Controller('api/messages')
 export class MessagesController {
@@ -74,7 +75,7 @@ export class MessagesController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 2_500_000 }),
-          new FileTypeValidator({ fileType: /(jpeg|jpg|png|gif)$/ }),
+          new FileTypeValidator({ fileType: /(jpeg|jpg|png|mp4)$/ }),
         ],
       }),
     )
@@ -82,6 +83,14 @@ export class MessagesController {
     @Param('id')
     id: number,
   ) {
+    if (!file) throw new BadRequestException('Nenhum arquivo foi recebido');
+
+    if (file.mimetype === 'image/gif')
+      throw new BadRequestException('GIFs não são suportados. Envie um .mp4');
+
+    if (file.size > 2_500_000)
+      throw new BadRequestException('Tamanho de arquivo inválido!');
+
     return await this.messagesService.addImageOrGifToMessageAsync(id, file);
   }
 
@@ -94,6 +103,8 @@ export class MessagesController {
     }
 
     const file = fs.createReadStream(filePath);
-    return new StreamableFile(file);
+    const contentType = mime.lookup(fileName) || 'application/octet-stream';
+
+    return new StreamableFile(file, { type: contentType, disposition: 'inline' });
   }
 }

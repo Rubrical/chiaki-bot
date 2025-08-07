@@ -18,7 +18,7 @@ export class MensagemListaComponent implements OnInit {
   pageSize = 10;
   pageNumber = 1;
   mensagensLista: Message[] = [];
-  getActive = false;
+  getActive = true;
 
   constructor(
     private router: Router,

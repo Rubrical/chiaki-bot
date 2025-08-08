@@ -29,28 +29,42 @@ const kiss: IChiakiCommand = {
       const msg = await MessageService.getMessage("joke", "beijar");
 
       if (!msg || !msg.mensagem) {
-        await M.reply("❌ Mensagem de brincadeira não encontrada no backend.");
+        await M.reply("❌ Mensagem de brincadeira não encontrada no Servidor.");
         return;
       }
 
-      const imageBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      let mediaPayload: any;
+      const mediaBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
       const text = `${msg.mensagem} @${mentioned.split("@")[0]}`;
+
+      if (mediaBuffer) {
+        if (ext === "mp4") {
+          mediaPayload = {
+            gifPlayback: true,
+            video: mediaBuffer,
+            caption: text,
+          };
+        } else {
+          mediaPayload = {
+            image: mediaBuffer,
+            caption: text,
+          };
+        }
+      } else {
+        mediaPayload = {text};
+      }
 
       try {
         await client.sendMessage(
           M.from,
           {
-            ...(imageBuffer
-              ? {
-                  image: imageBuffer,
-                  caption: text,
-                }
-              : {
-                  text,
-                }),
+            ...mediaPayload,
             mentions: [mentioned],
           },
-          { quoted: M }
+          {
+            quoted: M
+          }
         );
       } catch(err) {
         const now = new Date(Date.now());

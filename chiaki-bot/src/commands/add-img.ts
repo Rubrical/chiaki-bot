@@ -10,7 +10,7 @@ const addImg: IChiakiCommand = {
       aliases: ["add-img"],
       category: "moderação",
       usage: "add-img [tipo] (respondendo a imagem/gif)",
-      description: "Adiciona uma imagem ou gif a uma mensagem personalizada",
+      description: "Adiciona uma imagem ou gif a uma mensagem personalizada. Os tipos podem ser \"welcome-message\" e \"goodbye-message\"",
     },
 
     async execute(client: ChiakiClient, flag: string[], arg: string, M: SerializedMessage): Promise<void> {
@@ -28,14 +28,14 @@ const addImg: IChiakiCommand = {
         }
 
         const groupMetadata = await client.groupMetadata(M.from).catch(() => null);
-        const groupName = groupMetadata?.subject;
+        const groupId = groupMetadata.id;
 
-        if (!groupName) {
+        if (!groupId) {
           await M.reply("❌ Não foi possível identificar o nome do grupo.");
           return;
         }
 
-        const existingMessage = await MessageService.getMessage(messageType, groupName);
+        const existingMessage = await MessageService.getMessage(messageType, groupId);
 
         if (!existingMessage || typeof existingMessage === "string") {
           await M.reply("❌ A mensagem ainda não foi criada. Use o comando correspondente para criar antes de adicionar imagem.");

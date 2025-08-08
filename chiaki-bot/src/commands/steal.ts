@@ -31,25 +31,40 @@ const steal: IChiakiCommand = {
         return;
       }
 
-      const imageBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      let mediaPayload: any;
+      const mediaBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
       const text = msg.mensagem
         .replace("{A}", `@${M.sender.split("@")[0]}`)
         .replace("{B}", `@${mentioned.split("@")[0]}`);
+
+      if (mediaBuffer) {
+        if (ext === "mp4") {
+          mediaPayload = {
+            gifPlayback: true,
+            video: mediaBuffer,
+            caption: text,
+          };
+        } else {
+          mediaPayload = {
+            image: mediaBuffer,
+            caption: text,
+          };
+        }
+      } else {
+        mediaPayload = {text};
+      }
+
       try {
         await client.sendMessage(
           M.from,
           {
-            ...(imageBuffer
-              ? {
-                  image: imageBuffer,
-                  caption: text,
-                }
-              : {
-                  text,
-                }),
+            ...mediaPayload,
             mentions: [M.sender, mentioned],
           },
-          { quoted: M }
+          {
+            quoted: M
+          }
         );
       } catch(err) {
         const now = new Date(Date.now());

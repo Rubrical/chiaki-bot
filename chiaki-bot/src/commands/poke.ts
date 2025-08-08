@@ -31,19 +31,37 @@ const poke: IChiakiCommand = {
       return;
     }
 
+    let mediaPayload: any;
     const senderTag = `@${M.sender.split("@")[0]}`;
     const targetTag = `@${mentioned.split("@")[0]}`;
+    const mediaBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+    const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
     const text = msg.mensagem
       .replace("{A}", senderTag)
       .replace("{B}", targetTag);
 
-    const media = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+    if (mediaBuffer) {
+      if (ext === "mp4") {
+        mediaPayload = {
+          gifPlayback: true,
+          video: mediaBuffer,
+          caption: text,
+        };
+      } else {
+        mediaPayload = {
+          image: mediaBuffer,
+          caption: text,
+        };
+      }
+    } else {
+      mediaPayload = {text};
+    }
 
     try {
       await client.sendMessage(
         M.from,
         {
-          ...(media ? { image: media, caption: text } : { text }),
+          ...mediaPayload,
           mentions: [M.sender, mentioned],
         },
         { quoted: M }

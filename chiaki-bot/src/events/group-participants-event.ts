@@ -8,9 +8,6 @@ export async function GroupParticipantsEvent(
     event: GroupParticipantsEventUpdateType,
     client: ChiakiClient
 ) {
-    client.log.info("----- Evento: Atualização de participantes de grupo ------ ");
-    client.log.info(JSON.stringify(event));
-
     const botFullId = client.user.id;
     const botJid = botFullId.includes(":")
         ? botFullId.replace(/:\d+/, "")
@@ -39,7 +36,8 @@ export async function GroupParticipantsEvent(
 
     const groupMetadata = await client.groupMetadata(event.id).catch(() => null);
     let text: string | null = null;
-    let imageBuffer: Buffer | null = null;
+    let mediaBuffer: Buffer | null = null;
+    let ext: string = "";
     let wasUserBanned = false;
 
     if (event.action === "add") {
@@ -86,12 +84,13 @@ export async function GroupParticipantsEvent(
             try {
                 if (typeof messageStatus !== "string" && messageStatus?.isWelcomeMessageActive) {
                     const message = await MessageService.getMessage("welcome-message", groupMetadata?.subject);
+                    ext = message.midia ? client.utils.getExtensionFromUrl(message.midia) : "";
                     if (message === null) {
                         text = `Seja muito bem-vindo(a) ao nosso grupo! => *${groupMetadata?.subject}* -\n\n💈 *Descrição do Grupo:*\n${groupMetadata?.desc || 'Sem descrição disponível.'}\n\nSiga as regras e se divirta!\n\n*‣ ${event.participants.map(jid => `@${jid.split('@')[0]}`).join(' ')}*`;
                     } else {
                         text = message.mensagem + `\n@${parsedJid}`;
                         if (message.midia) {
-                            imageBuffer = await MessageService.getMedia(message.midia);
+                            mediaBuffer = await MessageService.getMedia(message.midia);
                         }
                     }
                 }
@@ -113,12 +112,13 @@ export async function GroupParticipantsEvent(
             try {
                 if (typeof messageStatus !== "string" && messageStatus?.isGoodByeMessageActive) {
                     const message = await MessageService.getMessage("goodbye-message", groupMetadata?.subject);
+                    ext = message.midia ? client.utils.getExtensionFromUrl(message.midia) : "";
                     if (message === null) {
                         text = `Adeus *${event.participants.map(jid => `@${jid.split('@')[0]}`).join(', ')}* 👋🏻, sentiremos sua falta`;
                     } else {
                         text = message.mensagem;
                         if (message.midia) {
-                            imageBuffer = await MessageService.getMedia(message.midia);
+                            mediaBuffer = await MessageService.getMedia(message.midia);
                         }
                     }
                 }
@@ -144,18 +144,38 @@ export async function GroupParticipantsEvent(
         }
     }
 
-    if (text && !imageBuffer) {
+    if (text && !mediaBuffer) {
         await client.sendMessage(event.id, {
             text,
             mentions: event.participants
         });
+        return;
     }
 
-    if (text && imageBuffer) {
+    if (text && mediaBuffer) {
+
         try {
-            await client.sendMessage(event.id, {
-                image: Buffer.from(imageBuffer),
+          let mediaPayload: any;
+
+          if (mediaBuffer) {
+            if (ext === "mp4") {
+              mediaPayload = {
+                gifPlayback: true,
+                video: mediaBuffer,
                 caption: text,
+              };
+            } else {
+              mediaPayload = {
+                image: mediaBuffer,
+                caption: text,
+              };
+            }
+          } else {
+            mediaPayload = {text};
+          }
+
+          await client.sendMessage(event.id, {
+                ...mediaPayload,
                 mentions: event.participants,
             });
 

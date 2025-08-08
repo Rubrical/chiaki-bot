@@ -48,23 +48,41 @@ const hottie: IChiakiCommand = {
       targetJid = randomUser.id;
     }
 
+    let mediaPayload: any;
+    const mediaBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+    const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
     const percentage = Math.floor(Math.random() * 101);
     const text = msg.mensagem
       .replace("{A}", `@${targetJid.split("@")[0]}`)
       .replace("{PERCENTAGE}", String(percentage));
 
-    const imageBuffer = msg.midia
-      ? await MessageService.getMedia(msg.midia)
-      : null;
+    if (mediaBuffer) {
+      if (ext === "mp4") {
+        mediaPayload = {
+          gifPlayback: true,
+          video: mediaBuffer,
+          caption: text,
+        };
+      } else {
+        mediaPayload = {
+          image: mediaBuffer,
+          caption: text,
+        };
+      }
+    } else {
+      mediaPayload = {text};
+    }
 
     try {
       await client.sendMessage(
         M.from,
         {
-          ...(imageBuffer ? { image: imageBuffer, caption: text } : { text }),
+          ...mediaPayload,
           mentions: [targetJid],
         },
-        { quoted: M }
+        {
+          quoted: M
+        }
       );
     } catch(err) {
       const now = new Date(Date.now());

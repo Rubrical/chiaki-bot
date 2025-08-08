@@ -25,23 +25,41 @@ const rich: IChiakiCommand = {
         return;
       }
 
+      let mediaPayload: any;
       const percentage = Math.floor(Math.random() * 101);
+      const mediaBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      const ext = msg.midia ? client.utils.getExtensionFromUrl(msg.midia) : "";
       const text = msg.mensagem
         .replace("{A}", `@${M.sender.split("@")[0]}`)
         .replace("{PERCENTAGE}", percentage.toString());
 
-      const imageBuffer = msg.midia ? await MessageService.getMedia(msg.midia) : null;
+      if (mediaBuffer) {
+        if (ext === "mp4") {
+          mediaPayload = {
+            gifPlayback: true,
+            video: mediaBuffer,
+            caption: text,
+          };
+        } else {
+          mediaPayload = {
+            image: mediaBuffer,
+            caption: text,
+          };
+        }
+      } else {
+        mediaPayload = {text};
+      }
 
       try {
         await client.sendMessage(
           M.from,
           {
-            ...(imageBuffer
-              ? { image: imageBuffer, caption: text }
-              : { text }),
+            ...mediaPayload,
             mentions: [M.sender],
           },
-          { quoted: M }
+          {
+            quoted: M
+          }
         );
       } catch(err) {
         const now = new Date(Date.now());

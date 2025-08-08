@@ -309,14 +309,14 @@ export class GroupsService {
     if (!group) throw new BadRequestException('Grupo não encontrado');
 
     const messageExists = await this.messageRepository.findOneBy({
-      chaveMensagem: `${messageType}:${group.nomeGrupo}`,
+      chaveMensagem: `${messageType}:${group.whatsappGroupId}`,
     });
 
     if (!messageExists) {
       const messageNew = this.messageRepository.create({
         dataCadastro: new Date(),
         mensagem: messageDto.messageContent,
-        chaveMensagem: `${messageType}:${group.nomeGrupo}`,
+        chaveMensagem: `${messageType}:${group.whatsappGroupId}`,
       });
 
       const savedMessage = await this.messageRepository.save(messageNew);

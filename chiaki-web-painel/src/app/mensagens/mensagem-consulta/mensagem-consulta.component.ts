@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Message } from '../../shared/models/message';
 import { MessagesService } from '../../shared/services/messages.service';
@@ -9,7 +9,7 @@ import { VoltarComponent } from '../../shared/voltar/voltar.component';
 @Component({
   selector: 'app-mensagem-consulta',
   standalone: true,
-  imports: [CommonModule, VoltarComponent, RouterLink, NgOptimizedImage],
+  imports: [CommonModule, VoltarComponent, RouterLink],
   templateUrl: './mensagem-consulta.component.html',
   styleUrl: './mensagem-consulta.component.sass'
 })
@@ -29,7 +29,9 @@ export class MensagemConsultaComponent implements OnInit {
 
   ngOnInit(): void {
     const chaveMensagem = this.route.snapshot.paramMap.get('id');
+    console.log("Ng on init", chaveMensagem);
     if (chaveMensagem) {
+      this.chaveMensagem = chaveMensagem;
       this.messagesService.getMessageByCodeMessage(chaveMensagem).subscribe({
         next: res => {
           this.message = res;

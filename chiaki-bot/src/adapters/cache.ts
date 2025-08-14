@@ -1,16 +1,105 @@
-import NodeCache from "node-cache";
+import IORedis, { Redis }  from "ioredis";
 
-const DEFAULT_TTL = 60;
-const FLUSH_INTERVAL = 60 * 60 * 24;
-const cache = new NodeCache({ deleteOnExpire: true, stdTTL: DEFAULT_TTL });
+const DEFAULT_TTL = 180;
+const NAMESPACE = "bot";
+const PREFIX = NAMESPACE.endsWith(":") ? NAMESPACE : `${NAMESPACE}:`;
+const pendingPromises = new Map<string, Promise<any>>();
+let _redis: Redis | null = null;
+
+function getRedis(): Redis {
+  if (_redis) return _redis;
+  const url = process.env.REDIS_URL || "redis://127.0.0.1:6379/0";
+  _redis = new IORedis(url, {
+    retryStrategy(times) {
+      return Math.min(1000 * 2 ** times, 30000);
+    },
+    maxRetriesPerRequest: 30,
+    enableReadyCheck: true,
+  });
+  return _redis;
+}
+
+const k = (key: string) => `${PREFIX}${key}`;
+
+function toJSON(value: any): string {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    // se falhar, guarda como string "bruta"
+    return String(value);
+  }
+}
+function fromJSON<T = any>(raw: string | null): T | undefined {
+  if (raw == null) return undefined;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return raw as unknown as T;
+  }
+}
 
 export const CacheManager = {
-    set: (key: string, value: any, ttl?: number): boolean =>
-        cache.set(key, value, ttl ?? DEFAULT_TTL),
-    get: <T =any>(key: string): T | undefined => cache.get(key),
-    del: (key: string): number => cache.del(key),
-    has: (key: string): boolean => cache.has(key),
-    flush: (): void => cache.flushAll(),
-};
+  set: async (key: string, value: any, ttl?: number): Promise<boolean> => {
+    const redis = getRedis();
+    const secs = ttl ?? DEFAULT_TTL;
+    // SET key value EX ttl
+    await redis.set(k(key), toJSON(value), "EX", secs);
+    return true;
+  },
 
-setInterval(() => CacheManager.flush(), FLUSH_INTERVAL * 1000);
+  get: async <T = any>(key: string): Promise<T | undefined> => {
+    const redis = getRedis();
+    const raw = await redis.get(k(key));
+    return fromJSON<T>(raw);
+  },
+
+  del: async (key: string): Promise<number> => {
+    const redis = getRedis();
+    return redis.del(k(key));
+  },
+
+  has: async (key: string): Promise<boolean> => {
+    const redis = getRedis();
+    const n = await redis.exists(k(key));
+    return n === 1;
+  },
+
+  flush: async (): Promise<void> => {
+    const redis = getRedis();
+    const stream = redis.scanStream({
+      match: k('*'),
+      count: 100,
+    });
+
+    for await (const keys of stream) {
+      if (Array.isArray(keys) && keys.length > 0) {
+        await redis.del(...keys);
+      }
+    }
+  },
+
+  getOrSet: async <T = any>(
+    key: string,
+    ttlSeconds: number,
+    loader: () => Promise<T>
+  ): Promise<T> => {
+    const hit = await CacheManager.get<T>(key);
+    const pending = pendingPromises.get(key);
+
+    if (hit !== undefined) return hit;
+    if (pending) return pending;
+
+    const promise = loader();
+    pendingPromises.set(key, promise);
+
+    try {
+      const value = await promise;
+      await CacheManager.set(key, value, ttlSeconds);
+      return value;
+    } finally {
+     pendingPromises.delete(key);
+    }
+  },
+
+  connection: (): Redis => getRedis(),
+};

@@ -5,6 +5,7 @@ import { serialize } from "../utils/serialize";
 import { UsersService, UserRequest } from '../services/user-service';
 import { GroupsService } from "../services/group-service";
 import { GroupUserRequest } from '../types/domain';
+import { CacheManager } from "../adapters/cache";
 
 export async function MessageUpsertEvent(messages: MessagesUpsertType, client: ChiakiClient) {
     logger.info("---- Mensagens abaixo -----");

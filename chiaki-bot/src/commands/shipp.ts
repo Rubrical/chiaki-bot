@@ -1,6 +1,7 @@
-import { proto } from "@whiskeysockets/baileys";
+import { GroupMetadata, proto } from "@whiskeysockets/baileys";
 import { MessageService } from "../services/messages-service";
 import { IChiakiCommand, ChiakiClient, SerializedMessage } from "../types/types";
+import { CacheManager } from "../adapters/cache";
 
 const shipp: IChiakiCommand = {
     command: {
@@ -18,7 +19,14 @@ const shipp: IChiakiCommand = {
       M: SerializedMessage,
       rawMessage: proto.IWebMessageInfo[]
     ): Promise<void> {
-      const groupMetadata = await client.groupMetadata(M.from);
+      let groupMetadata: GroupMetadata = null;
+      groupMetadata = await CacheManager.get(`groups:${M.from}`);
+
+      if (!groupMetadata) {
+        groupMetadata = await client.groupMetadata(M.from);
+        await CacheManager.set(`groups:${M.from}`, groupMetadata, 600);
+      }
+
       const members = groupMetadata.participants.map(p => p.id).filter(id => id !== client.user.id);
 
       if (members.length < 2) {

@@ -25,7 +25,6 @@ function toJSON(value: any): string {
   try {
     return JSON.stringify(value);
   } catch {
-    // se falhar, guarda como string "bruta"
     return String(value);
   }
 }
@@ -42,7 +41,6 @@ export const CacheManager = {
   set: async (key: string, value: any, ttl?: number): Promise<boolean> => {
     const redis = getRedis();
     const secs = ttl ?? DEFAULT_TTL;
-    // SET key value EX ttl
     await redis.set(k(key), toJSON(value), "EX", secs);
     return true;
   },

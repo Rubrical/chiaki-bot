@@ -2,6 +2,8 @@ import { MessageService, MessageType } from "../services/messages-service";
 import { IChiakiCommand, ChiakiClient, SerializedMessage } from "../types/types";
 import { safeDownloadMedia } from "./sticker";
 import mime from "mime-types";
+import { GroupMetadata } from "@whiskeysockets/baileys";
+import { CacheManager } from "../adapters/cache";
 
 
 const addImg: IChiakiCommand = {
@@ -14,6 +16,7 @@ const addImg: IChiakiCommand = {
     },
 
     async execute(client: ChiakiClient, flag: string[], arg: string, M: SerializedMessage): Promise<void> {
+        let groupMetadata: GroupMetadata = await CacheManager.get(`groups:${M.from}`);
         const validTypes: MessageType[] = ["welcome-message", "goodbye-message"];
         const messageType = arg.trim() as MessageType;
 
@@ -27,7 +30,11 @@ const addImg: IChiakiCommand = {
           return;
         }
 
-        const groupMetadata = await client.groupMetadata(M.from).catch(() => null);
+        if (!groupMetadata) {
+          groupMetadata = await client.groupMetadata(M.from).catch(() => null);
+          await CacheManager.set(`groups:${M.from}`, groupMetadata, 600);
+        }
+
         const groupId = groupMetadata.id;
 
         if (!groupId) {

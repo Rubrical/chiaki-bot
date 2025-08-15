@@ -1,4 +1,6 @@
 import { IChiakiCommand } from "../types/types";
+import { GroupMetadata } from "@whiskeysockets/baileys";
+import { CacheManager } from "../adapters/cache";
 
 const mentionAll: IChiakiCommand = {
   command: {
@@ -12,13 +14,19 @@ const mentionAll: IChiakiCommand = {
   async execute(client, flag, arg, M, rawMessage) {
     if (!M.isGroup) return;
 
-    const groupData = await client.groupMetadata(M.from);
+    let groupData: GroupMetadata = null;
+    groupData = await CacheManager.get<GroupMetadata>(`groups:${M.from}`);
+
+    if (!groupData) {
+      groupData = await client.groupMetadata(M.from);
+      await CacheManager.set(`groups:${M.from}`, groupData);
+    }
+
+    let mentionMessage = "";
     const admNumber = M.sender.split("@")[0];
     const admPushName = M.pushName;
     const whoMentioned = `Menção do ADM ${admPushName} @${admNumber}`;
     const members = groupData.participants.map((x) => x.id) || [];
-
-    let mentionMessage = "";
 
     if (M.body?.startsWith(`${client.config.prefix}totag`)) {
       mentionMessage = M.body.replace(`${client.config.prefix}totag`, "").trim();

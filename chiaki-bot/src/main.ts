@@ -9,6 +9,7 @@ import { MessageUpsertEvent } from './events/messages-upsert-event';
 import { GroupsUpsert } from './events/groups-upsert-event';
 import { GroupsUpdate } from './events/groups-update-event';
 import { AdvertenceService } from './services/advertence-service';
+import { CacheManager } from "./adapters/cache";
 
 function getConfig(): ChiakiConfig {
     return {
@@ -26,6 +27,7 @@ const start = async (): Promise<ChiakiClient | void> => {
         logger: P({ level: 'silent' }),
         qrTimeout: 20 * 1000,
         shouldSyncHistoryMessage: () => false,
+        cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
     }) as ChiakiClient;
 
     client.utils = utils;

@@ -53,5 +53,4 @@ const start = async (): Promise<ChiakiClient | void> => {
     return client;
 };
 
-
 start().catch(err => logger.error(err));

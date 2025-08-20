@@ -150,7 +150,7 @@ async function editImage(buffer: Buffer, type: StickerType): Promise<Buffer> {
   return image.getBufferAsync('image/png');
 }
 
-async function addExif(buffer: Buffer, pack: string, author: string): Promise<Buffer> {
+export async function addExif(buffer: Buffer, pack: string, author: string): Promise<Buffer> {
   const img = new webp.Image();
   const stickerPackId = crypto.randomBytes(32).toString('hex');
   const json = {

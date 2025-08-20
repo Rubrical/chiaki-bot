@@ -21,11 +21,13 @@ import poke from "./poke";
 import rank from "./rank";
 import removeAdvertence from "./rem-adv";
 import remove from "./remove";
+import renameStickerCommand from "./rename";
 import rich from "./rich";
 import shipp from "./shipp";
 import slap from "./slap";
 import steal from "./steal";
 import stickerCommand from "./sticker";
+import toMediaCommand from "./to-media";
 import unbanUser from "./unban";
 
 const commands: Array<IChiakiCommand> = [
@@ -56,7 +58,9 @@ const commands: Array<IChiakiCommand> = [
     divorce,
     hottie,
     poke,
-    chance
+    chance,
+    renameStickerCommand,
+    toMediaCommand,
 ];
 
 export const loadCommands = (client: ChiakiClient): ChiakiClient => {

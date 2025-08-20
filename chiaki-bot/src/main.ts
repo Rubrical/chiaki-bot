@@ -36,7 +36,7 @@ const start = async (): Promise<ChiakiClient | void> => {
     const isInstalled = await client.utils.verifyIfFFMPEGisInstalled();
     if (!isInstalled) {
         logger.warn('O FFMPEG não está instalado, instale-o!');
-        return;
+        process.exit(1);
     }
 
     client.ev.on('creds.update', saveCreds);

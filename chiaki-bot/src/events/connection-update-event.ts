@@ -41,7 +41,7 @@ export async function ConnectionUpdateEvent(
 
         if (connectionAttempts >= 5) {
             logger.error("Limite de tentativas excedido. Abortando.");
-            return;
+            process.exit(1);
         }
 
         logger.warn(`Conexão encerrada. Reconectando (${connectionAttempts + 1}/5)...`);

@@ -5,11 +5,9 @@ import { serialize } from "../utils/serialize";
 import { UsersService, UserRequest } from '../services/user-service';
 import { GroupsService } from "../services/group-service";
 import { GroupUserRequest } from '../types/domain';
+import { addCommandJob } from "../jobs/queue";
 
 export async function MessageUpsertEvent(messages: MessagesUpsertType, client: ChiakiClient) {
-    logger.info("---- Mensagens abaixo -----");
-    logger.info(JSON.stringify(messages));
-
     if (!messages.messages?.length || messages.type !== 'notify') return;
 
     const M = serialize(JSON.parse(JSON.stringify(messages.messages[0])), client);
@@ -58,8 +56,6 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
     if (isGroup) {
         const target: GroupUserRequest = { groupRemoteJid: from, userRemoteJid: remoteJid };
         const isCmd = body?.startsWith(client.config.prefix);
-
-        client.log.info(`[DEBUG] ${isCmd ? 'Comando' : 'Mensagem'} detectado de ${remoteJid} no grupo ${from}`);
 
         try {
             if (isCmd) {
@@ -122,8 +118,14 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
             }
         }
 
-        client.log.info(`Executando comando: ${command.command.name} para ${M.from}`);
-        await command.execute(client, flag, arg, M, messages.messages);
+        for (const message of messages.messages) {
+          await addCommandJob({
+            command: command,
+            rawMessage: message,
+            arg,
+            flag
+          });
+        }
     } catch (err) {
         client.log.error('[ERRO NO COMANDO] Mesmo sem backend, algo falhou ao executar comando:', err);
     }

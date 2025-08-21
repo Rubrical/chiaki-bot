@@ -3,6 +3,8 @@ import { GroupsService } from "../services/group-service";
 import { MessageService } from "../services/messages-service";
 import { UsersService } from "../services/user-service";
 import { ChiakiClient, GroupParticipantsEventUpdateType } from "../types/types";
+import { CacheManager } from "../adapters/cache";
+import { GroupMetadata } from "@whiskeysockets/baileys";
 
 export async function GroupParticipantsEvent(
     event: GroupParticipantsEventUpdateType,
@@ -33,8 +35,13 @@ export async function GroupParticipantsEvent(
     } catch (err) {
         client.log.warn("[Backend offline tolerado] Erro ao verificar status de mensagens de grupo");
     }
+    let groupMetadata = await CacheManager.get<GroupMetadata>(`groups:${event.id}`);
 
-    const groupMetadata = await client.groupMetadata(event.id).catch(() => null);
+    if (!groupMetadata) {
+        groupMetadata = await client.groupMetadata(event.id).catch(() => null);
+        await CacheManager.set(`groups:${event.id}`, groupMetadata, 600);
+    }
+
     let text: string | null = null;
     let mediaBuffer: Buffer | null = null;
     let ext: string = "";

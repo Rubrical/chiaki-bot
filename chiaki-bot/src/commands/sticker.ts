@@ -70,7 +70,7 @@ export function ensureTempDir(): string {
 const stickerCommand: IChiakiCommand = {
   command: {
     name: "sticker",
-    aliases: ["s", "figurinha", "stiker", "f"],
+    aliases: ["s", "figurinha", "sticker", "f"],
     category: "utilidades",
     usage: "[marque mídia] |Nome Pacote|Autor",
     description: "Converte imagens, vídeos e GIFs em figurinhas",

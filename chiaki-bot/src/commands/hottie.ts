@@ -1,6 +1,7 @@
-import { proto } from "@whiskeysockets/baileys";
+import { proto, GroupMetadata } from "@whiskeysockets/baileys";
 import { MessageService } from "../services/messages-service";
 import { IChiakiCommand, ChiakiClient, SerializedMessage } from "../types/types";
+import { CacheManager } from "../adapters/cache";
 
 const hottie: IChiakiCommand = {
   command: {
@@ -26,20 +27,25 @@ const hottie: IChiakiCommand = {
     }
 
     let targetJid = M.mentions[0];
+    let metadata: GroupMetadata | null = null;
 
     // Caso não haja menção, buscar membro aleatório do grupo
     if (!targetJid) {
-      const metadata = await client.groupMetadata(M.from).catch(() => null);
+      metadata = await CacheManager.get(`groups:${M.from}`);
+
+      if (!metadata) {
+        metadata = await client.groupMetadata(M.from).catch(() => null);
+        await CacheManager.set(`groups:${M.from}`, metadata, 300);
+      }
+
       if (!metadata) {
         await M.reply("❌ Não foi possível obter os membros do grupo.");
         return;
       }
 
-      const participants = metadata.participants.filter(
-        (p) => p.id !== client.user.id
-      );
-      const randomUser =
-        participants[Math.floor(Math.random() * participants.length)];
+      const participants = metadata.participants.filter((p) => p.id !== client.user.id);
+      const randomUser = participants[Math.floor(Math.random() * participants.length)];
+
       if (!randomUser) {
         await M.reply("❌ Grupo sem participantes válidos.");
         return;

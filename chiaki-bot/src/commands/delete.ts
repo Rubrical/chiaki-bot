@@ -1,4 +1,6 @@
 import { IChiakiCommand } from "../types/types";
+import { GroupMetadata } from "@whiskeysockets/baileys";
+import { CacheManager } from "../adapters/cache";
 
 const deleteMessage: IChiakiCommand = {
   command: {
@@ -15,11 +17,18 @@ const deleteMessage: IChiakiCommand = {
       return;
     }
 
+    let metadata: GroupMetadata = null;
     const isGroup = M.isGroup;
     const key = M.quoted.key;
 
     if (isGroup) {
-      const metadata = await client.groupMetadata(M.from);
+      metadata = await CacheManager.get<GroupMetadata>(`groups:${M.from}`);
+
+      if (!metadata) {
+        metadata = await client.groupMetadata(M.from);
+        await CacheManager.set(`groups:${M.from}`, metadata, 600);
+      }
+
       const botNumber = client.user.id.split(":")[0] + "@s.whatsapp.net";
       const sender = M.sender;
       const botInfo = metadata.participants.find((x) => x.id === botNumber);

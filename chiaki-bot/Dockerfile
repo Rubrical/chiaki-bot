@@ -1,35 +1,30 @@
-FROM node:lts-buster as builder
+FROM node:22.3.0-alpine as builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-  ffmpeg imagemagick build-essential libcairo2-dev libpango1.0-dev \
-  libjpeg-dev libgif-dev librsvg2-dev webp && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache python3 make g++ build-base cairo-dev pango-dev \
+    libjpeg-turbo-dev giflib-dev librsvg-dev
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
 
 COPY . .
 RUN npm run build
 
-FROM node:lts-buster
-
+FROM node:22.3.0-alpine
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-  ffmpeg imagemagick webp && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ffmpeg imagemagick libwebp
 
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+RUN npm ci --omit=dev
+
 COPY --from=builder /app/dist ./dist
 
 RUN mkdir -p /app/src/temp
+VOLUME ["/app/session", "/app/logs"]
 
-VOLUME [ "/app/session", "/app/logs" ]
-
-EXPOSE 3000
+EXPOSE 3001
+ENV TZ=America/Sao_Paulo
 
 CMD ["node", "dist/main.js"]

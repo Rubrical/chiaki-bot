@@ -10,6 +10,7 @@ import { GroupsUpsert } from './events/groups-upsert-event';
 import { GroupsUpdate } from './events/groups-update-event';
 import { AdvertenceService } from './services/advertence-service';
 import { CacheManager } from "./adapters/cache";
+import { setupWorker } from "./jobs/worker";
 
 function getConfig(): ChiakiConfig {
     return {
@@ -48,6 +49,7 @@ const start = async (): Promise<ChiakiClient | void> => {
     client.ev.on("groups.update", async (event) => await GroupsUpdate(event, client));
     client.ev.on('group-participants.update', async (event) => await GroupParticipantsEvent(event, client));
 
+    await setupWorker(client);
     setInterval(AdvertenceService.cleanAll, sevenDays);
 
     return client;

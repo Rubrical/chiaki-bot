@@ -16,6 +16,8 @@ services:
       - ./logs:/app/logs:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - valkey
     restart: always
 
   api:
@@ -35,7 +37,7 @@ services:
     restart: always
 
   chiaki-web-panel:
-    image: chiaki-web-painel
+    image: chiaki-web-painel:latest
     container_name: chiaki-web-painel
     build:
       context: ./chiaki-web-painel
@@ -43,3 +45,16 @@ services:
     ports:
       - "80:80"
     restart: always
+
+  valkey:
+    image: valkey/valkey:8.1.3-alpine
+    container_name: valkey
+    ports:
+      - "6379:6379"
+    restart: always
+    command: valkey-server --requirepass "123"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-a", "123", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

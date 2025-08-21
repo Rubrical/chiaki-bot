@@ -8,7 +8,7 @@ let _redis: Redis | null = null;
 
 function getRedis(): Redis {
   if (_redis) return _redis;
-  const url = process.env.REDIS_URL || "redis://127.0.0.1:6379/0";
+  const url = process.env.REDIS_URL || "redis://:123@valkey:6379/0";
   _redis = new IORedis(url, {
     retryStrategy(times) {
       return Math.min(1000 * 2 ** times, 30000);

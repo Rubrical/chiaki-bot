@@ -118,12 +118,14 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
             }
         }
 
-        await addCommandJob({
-          commandName: cmdName,
-          rawMessage: messages.messages[0],
-          arg,
-          flag
-        });
+        for (const message of messages.messages) {
+          await addCommandJob({
+            command: command,
+            rawMessage: message,
+            arg,
+            flag
+          });
+        }
     } catch (err) {
         client.log.error('[ERRO NO COMANDO] Mesmo sem backend, algo falhou ao executar comando:', err);
     }

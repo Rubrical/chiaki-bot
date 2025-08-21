@@ -2,7 +2,6 @@ import logger from "../logger";
 import { QUEUE_NAME, ICommandJob } from "./queue";
 import { ChiakiClient } from "../types/types";
 import { Job, Worker } from "bullmq";
-import { CacheManager } from "../adapters/cache";
 import { serialize } from "../utils/serialize";
 import { valkeyConnectionOpts } from "./valkey-connection-opts";
 
@@ -11,7 +10,9 @@ export async function setupWorker(client: ChiakiClient) {
 
   new Worker<ICommandJob>(QUEUE_NAME,
     async (job: Job<ICommandJob>) => {
-      const { commandName, rawMessage, arg, flag } = job.data;
+      const { rawMessage, arg, flag } = job.data;
+      const commandName = job.data.command.command.name;
+
       logger.info(`[WORKER] Processando job: ${commandName} de ${rawMessage.key.remoteJid}`);
 
       const command = Array.from(

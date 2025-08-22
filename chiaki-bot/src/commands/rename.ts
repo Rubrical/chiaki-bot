@@ -13,7 +13,7 @@ const renameStickerCommand: IChiakiCommand = {
     },
 
     async execute(client, flag, arg, M) {
-        if (!M.quoted || M.quoted.type !== 'stickerMessage') {
+        if (!M.quoted || M.quoted.mtype !== 'stickerMessage') {
             return await M.reply("❌ Por favor, marque a figurinha que deseja renomear.");
         }
 
@@ -24,9 +24,20 @@ const renameStickerCommand: IChiakiCommand = {
             return M.reply("❌ Falha ao baixar a mídia da figurinha.");
         }
 
-        const parts = arg.split("|");
-        const packName = parts[0]?.trim() || `${client.config.name}`;
-        const authorName = parts[1]?.trim() || "ChiakiBot 2.0";
+      const parts = arg.split('|');
+      let packName: string;
+      let authorName: string;
+
+      if (parts.length > 1 && parts[0].trim() === '') {
+        packName = parts[1]?.trim();
+        authorName = parts[2]?.trim();
+      } else {
+        packName = parts[0]?.trim();
+        authorName = parts[1]?.trim();
+      }
+
+      if (!packName) packName = client.config.name;
+      if (!authorName) authorName = "ChiakiBot 2.0";
 
         try {
             const stickerBuffer = await addExif(mediaBuffer, packName, authorName);

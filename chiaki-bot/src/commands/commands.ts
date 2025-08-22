@@ -29,6 +29,7 @@ import steal from "./steal";
 import stickerCommand from "./sticker";
 import toMediaCommand from "./to-media";
 import unbanUser from "./unban";
+import youtubeDlCommand from "./youtube-dl";
 
 const commands: Array<IChiakiCommand> = [
     help,
@@ -61,6 +62,7 @@ const commands: Array<IChiakiCommand> = [
     chance,
     renameStickerCommand,
     toMediaCommand,
+    youtubeDlCommand
 ];
 
 export const loadCommands = (client: ChiakiClient): ChiakiClient => {

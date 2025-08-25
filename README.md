@@ -19,6 +19,9 @@ Chiaki é uma solução simplificada de automação para WhatsApp, composta por 
 - **Node.js**: Núcleo do bot.
 - **WebSockets**: Para o envio do QRCode de conexão para o front-end
 - **FFMPEG**: Para a geração de figurinhas
+- **BullMQ**: Para controle de filas de comandos
+- **Valkey/Redis**: Para cachear dados do socket e uso do BullMQ
+- **yt-dlp**: Para baixar vídeos e músicas diretamente do youtube
 - **Multer**: Para gerenciamento de imagens no backend
 - **NestJS**: Backend API.
 - **SQLite**: Banco de dados, perfeito para o caso de uso
@@ -28,6 +31,10 @@ Chiaki é uma solução simplificada de automação para WhatsApp, composta por 
 ## ⚙️ Funcionalidades
 - ✅ Gerenciamento de grupos
 - ✅ Criação de figurinhas
+- ✅ Renomeação de figurinhas
+- ✅ Download de figurinhas em imagens
+- ✅ Download de vídeos em mp4 ou mp3 diretamente do youtube
+- ✅ Mensagens de boas vindas personalizadas (com imagens e gifs!)
 - ✅ Funcionalidades de entretenimento e brincadeiras
 - ✅ Administração completa de grupos via bot
 - ✅ Painel web para consultas e relatórios

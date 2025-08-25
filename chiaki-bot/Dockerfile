@@ -14,7 +14,7 @@ RUN npm run build
 FROM node:22.3.0-alpine
 WORKDIR /app
 
-RUN apk add --no-cache ffmpeg imagemagick libwebp
+RUN apk add --no-cache ffmpeg imagemagick libwebp yt-dlp
 
 COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev

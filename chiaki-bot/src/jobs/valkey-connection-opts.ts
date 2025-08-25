@@ -1,6 +1,7 @@
+import { valkeyHost } from "../config/env-config";
+
 export const valkeyConnectionOpts = {
-  host: "valkey",
+  host: valkeyHost,
   port: 6379,
-  password: "123",
   db: 0,
 };

@@ -41,6 +41,10 @@ export async function safeDownloadMedia(
       return null;
     }
 
+    if (media.url.includes("web.whatsapp.net")) {
+      media.url = "https://mmg.whatsapp.net" + media.directPath;
+    }
+
     const stream = await downloadContentFromMessage(
       media,
       type.replace("Message", "") as any
@@ -96,7 +100,7 @@ const stickerCommand: IChiakiCommand = {
     }
 
     const parts = arg.split("|");
-    const packName = parts[1]?.trim() || `${client.config.name} 1.1`;
+    const packName = parts[1]?.trim() || `${client.config.name} 2.0`;
     const authorName = parts[2]?.trim() || client.config.name;
     const mediaBuffer = await safeDownloadMedia(M.quoted ?? M);
 

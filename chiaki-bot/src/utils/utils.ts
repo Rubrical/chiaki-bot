@@ -28,6 +28,27 @@ export const verifyIfFFMPEGisInstalled = (): Promise<boolean> => {
       if (code !== 0) resolve(false)
     })
   })
+};
+
+export const verifyIfYtDlpIsInstalled = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const proc = spawn('yt-dlp', ['--version']);
+
+    proc.on('error', () => resolve(false));
+    proc.stdout.on('data', data => {
+      if (data.toString().toLowerCase().includes('yt-dlp')) {
+        resolve(true);
+      }
+    });
+    proc.stderr.on('data', data => ({ resolve }) => {
+      if (data.toString().toLowerCase().includes('yt-dlp')) {
+        resolve(true);
+      }
+    });
+    proc.on('close', code => {
+      if (code !== 0) resolve(false);
+    });
+  });
 }
 
 export const validateRemoteJid = (remoteJid: string): JidInfo => {

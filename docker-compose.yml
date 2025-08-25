@@ -11,6 +11,7 @@ services:
     environment:
       - PREFIX=/
       - BACKEND_URL=http://api:3000/api/
+      - VALKEY_HOST=valkey
     volumes:
       - ./sessao:/app/session:rw
       - ./logs:/app/logs:rw
@@ -52,7 +53,7 @@ services:
     ports:
       - "6379:6379"
     restart: always
-    command: valkey-server --requirepass "123"
+    command: valkey-server #--requirepass "123"
     healthcheck:
       test: ["CMD", "valkey-cli", "-a", "123", "ping"]
       interval: 5s

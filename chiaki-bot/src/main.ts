@@ -36,10 +36,16 @@ const start = async (): Promise<ChiakiClient | void> => {
     client.cmd = new Map();
     client.log = logger;
 
-    const isInstalled = await client.utils.verifyIfFFMPEGisInstalled();
-    if (!isInstalled) {
+    const isInstalledFFMPEG = await client.utils.verifyIfFFMPEGisInstalled();
+    const isInstalledYtDlp = await client.utils.verifyIfFFMPEGisInstalled();
+    if (!isInstalledFFMPEG) {
         logger.warn('O FFMPEG não está instalado, instale-o!');
-        return;
+        process.exit(1);
+    }
+
+    if (!isInstalledYtDlp) {
+      logger.warn('O yt-dlp não está instalado, instale-o!');
+      process.exit(1);
     }
 
     client.ev.on('creds.update', saveCreds);

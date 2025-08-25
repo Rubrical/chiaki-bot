@@ -3,7 +3,7 @@ import { Logger } from 'winston';
 import { ParticipantAction } from "@whiskeysockets/baileys";
 import { JidInfo } from './domain';
 import { deprecate } from 'util';
-import { getExtensionFromUrl } from "../utils/utils";
+import { getExtensionFromUrl, verifyIfYtDlpIsInstalled } from "../utils/utils";
 
 /**
  * Configurações do ChiakiBot
@@ -22,6 +22,7 @@ export type ChiakiClient = WASocket & {
     extractUrls: (text: string) => string[];
     removeDuplicates: <T>(arr: T[]) => T[];
     verifyIfFFMPEGisInstalled(): Promise<boolean>;
+    verifyIfYtDlpIsInstalled(): Promise<boolean>;
     validateRemoteJid(remoteJid: string): JidInfo;
     getExtensionFromUrl: (url: string) => string;
   };

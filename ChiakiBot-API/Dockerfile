@@ -16,20 +16,22 @@ FROM node:22.3.0-slim
 
 WORKDIR /usr/src/app
 
-# Copiar todo o código-fonte e arquivos compilados
-COPY --from=builder /usr/src/app/build ./build
-COPY --from=builder /usr/src/app/src ./src
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/tsconfig.json ./
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Certifique-se de que a pasta database existe
+COPY --from=builder /usr/src/app/package*.json ./
+RUN npm ci --omit=dev \
+    && apt-get purge -y --auto-remove build-essential python3
+
+COPY --from=builder /usr/src/app/build ./build
+COPY --from=builder /usr/src/app/docker-entrypoint.sh .
+
 RUN mkdir -p ./database
 
 EXPOSE 3000
 
-# Criar script de inicialização
-RUN echo '#!/bin/bash\n\n# Executar migrations\necho "Running database migrations..."\nnpm run migration:run\n\n# Iniciar a aplicação\necho "Starting application..."\nnode build/main' > docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 
 CMD ["./docker-entrypoint.sh"]

@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  backendUrl: 'http://localhost:3000/api',
-  socketUrl: `localhost:3001`,
+  backendUrl: `${window.origin}:3000/api`,
+  socketUrl: `${window.origin}:3001`,
 };

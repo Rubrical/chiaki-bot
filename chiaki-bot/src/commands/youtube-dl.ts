@@ -5,11 +5,14 @@ import path from "path";
 import os from "os";
 import yts from "yt-search";
 import logger from "../logger";
+import { CookieFileNotFoundError } from '../types/cookie-file-not-found';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
 const MAX_MB = 100;
+const COOKIES_FILE_PATH = path.join(process.cwd(), "cookies.txt");
 
 async function runYtDlp(url: string, audio = false): Promise<{ filePath: string; title: string }> {
+  console.log(process.cwd(), "cookies.txt")
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "yt-"));
   const outTpl = path.join(tmpDir, "%(title).80s.%(ext)s");
 
@@ -19,17 +22,20 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
     "--restrict-filenames",
     "--max-filesize", `${MAX_MB}M`,
     "-o", outTpl,
-
-    // imprime título real e caminho final
     "--print", "before_dl:TITLE=%(title)s",
     "--print", "after_move:FILE=%(filepath)s",
   ];
 
+  if (await exists(COOKIES_FILE_PATH)) {
+    logger.info("Arquivo de cookies encontrado!");
+    args.unshift("--cookies", COOKIES_FILE_PATH);
+  } else {
+    throw new CookieFileNotFoundError("Arquivo de cookies inexistente");
+  }
+
   if (audio) {
-    // Extrai ÁUDIO e converte para MP3 (requer ffmpeg instalado e no PATH)
     args.push("-x", "--audio-format", "mp3", "--audio-quality", "0");
   } else {
-    // Baixa VÍDEO em MP4 (360p máx para caber no limite)
     args.push(
       "-f",
       `mp4[filesize<${MAX_MB}M]/mp4[height<=360][ext=mp4]/bv*[height<=360][ext=mp4]+ba[ext=m4a]`,
@@ -38,6 +44,7 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   }
 
   args.push(url);
+  args.unshift("--extractor-args", "youtube:player_client=web");
 
   const child = spawn("yt-dlp", args, { stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "", stderr = "";
@@ -64,7 +71,6 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
     else if (line.startsWith("FILE=")) filePath = line.substring("FILE=".length);
   }
 
-  // fallback: se o FILE não veio ou não existe, procurar a extensão esperada no tmpDir
   if (!filePath || !(await exists(filePath))) {
     const files = await fs.readdir(tmpDir);
     const targetExt = audio ? ".mp3" : ".mp4";
@@ -89,7 +95,6 @@ async function exists(p: string) {
 }
 
 function toMp3FileName(title: string) {
-  // Garante um nome simples e com .mp3
   const base = title.replace(/[^\w\s.-]+/g, "_").trim().slice(0, 80) || "audio";
   return base.endsWith(".mp3") ? base : `${base}.mp3`;
 }
@@ -108,7 +113,6 @@ const youtubeDlCommand: IChiakiCommand = {
       return M.reply("❌ Forneça a URL de um vídeo do YouTube ou um termo para busca.");
     }
 
-    // flag é array de strings
     const audio = Array.isArray(flag) && flag.some(f => /^(--)?(mp3|audio)$/i.test(f));
 
     await M.reply(audio ? "🎵 Baixando áudio em MP3, aguarde..." : "🎬 Baixando vídeo em MP4, aguarde...");
@@ -137,8 +141,8 @@ const youtubeDlCommand: IChiakiCommand = {
           M.from,
           {
             audio: buffer,
-            mimetype: "audio/mpeg",           // <- MIME correto para MP3
-            fileName: toMp3FileName(title),   // <- garante .mp3
+            mimetype: "audio/mpeg",
+            fileName: toMp3FileName(title),
           },
           { quoted: M }
         );
@@ -157,6 +161,12 @@ const youtubeDlCommand: IChiakiCommand = {
       });
     } catch (error: any) {
       logger.error("Erro no comando YouTube:", error);
+
+      if (error instanceof CookieFileNotFoundError) {
+        await M.reply("❌ Erro ao buscar informações. Configure os cookies de acesso!");
+        return;
+      }
+
       await M.reply("❌ Erro ao baixar/enviar. Tente outro link/termo ou um arquivo menor que 100MB.");
     }
   },

@@ -14,9 +14,15 @@ RUN npm run build
 FROM node:22.3.0-alpine
 WORKDIR /app
 
-RUN apk add --no-cache ffmpeg imagemagick libwebp yt-dlp
+RUN apk add --no-cache ffmpeg imagemagick libwebp ca-certificates curl \
+ && update-ca-certificates
+
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+     -o /usr/local/bin/yt-dlp \
+ && chmod a+rx /usr/local/bin/yt-dlp
 
 COPY --from=builder /app/package*.json ./
+COPY cookies.txt .
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist

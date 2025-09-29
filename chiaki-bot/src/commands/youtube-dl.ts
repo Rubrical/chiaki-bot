@@ -9,10 +9,9 @@ import { CookieFileNotFoundError } from '../types/cookie-file-not-found';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
 const MAX_MB = 100;
-const COOKIES_FILE_PATH = path.join(process.cwd(), "cookies.txt");
+// const COOKIES_FILE_PATH = path.join(process.cwd(), "cookies.txt");
 
 async function runYtDlp(url: string, audio = false): Promise<{ filePath: string; title: string }> {
-  console.log(process.cwd(), "cookies.txt")
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "yt-"));
   const outTpl = path.join(tmpDir, "%(title).80s.%(ext)s");
 
@@ -24,14 +23,15 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
     "-o", outTpl,
     "--print", "before_dl:TITLE=%(title)s",
     "--print", "after_move:FILE=%(filepath)s",
-  ];
 
-  if (await exists(COOKIES_FILE_PATH)) {
-    logger.info("Arquivo de cookies encontrado!");
-    args.unshift("--cookies", COOKIES_FILE_PATH);
-  } else {
-    throw new CookieFileNotFoundError("Arquivo de cookies inexistente");
-  }
+    "--extractor-args", "youtube:player_client=android",
+    "--concurrent-fragments", "1",
+    "--http-chunk-size", "10M",
+    "--force-ipv4",
+    "--retries", "infinite",
+    "--fragment-retries", "infinite",
+    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  ];
 
   if (audio) {
     args.push("-x", "--audio-format", "mp3", "--audio-quality", "0");
@@ -44,7 +44,6 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   }
 
   args.push(url);
-  args.unshift("--extractor-args", "youtube:player_client=web");
 
   const child = spawn("yt-dlp", args, { stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "", stderr = "";
@@ -52,23 +51,16 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   child.stderr.on("data", d => (stderr += d.toString()));
 
   await new Promise<void>((resolve, reject) => {
-    child.on("close", (code) => {
-      if (code === 0) return resolve();
-      reject(new Error(`yt-dlp exit ${code}: ${stderr || stdout}`));
-    });
+    child.on("close", (code) => code === 0 ? resolve() : reject(new Error(`yt-dlp exit ${code}: ${stderr || stdout}`)));
   });
 
-  const lines = stdout
-    .split(/\r?\n/)
-    .map(s => s.trim())
-    .filter(Boolean);
-
+  const lines = stdout.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   let title = "YouTube";
   let filePath: string | undefined;
 
   for (const line of lines) {
-    if (line.startsWith("TITLE=")) title = line.substring("TITLE=".length);
-    else if (line.startsWith("FILE=")) filePath = line.substring("FILE=".length);
+    if (line.startsWith("TITLE=")) title = line.substring(6);
+    else if (line.startsWith("FILE=")) filePath = line.substring(5);
   }
 
   if (!filePath || !(await exists(filePath))) {
@@ -79,7 +71,7 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   }
 
   if (!filePath || !(await exists(filePath))) {
-    throw new Error(`Falha ao localizar o arquivo baixado. Saída:\n${stdout}\nErros:\n${stderr}`);
+    throw new Error(`Falha ao localizar o arquivo baixado.\nSaída:\n${stdout}\nErros:\n${stderr}`);
   }
 
   const stat = await fs.stat(filePath);

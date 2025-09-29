@@ -49,7 +49,7 @@ const start = async (): Promise<ChiakiClient | void> => {
     }
 
     client.ev.on('creds.update', saveCreds);
-    client.ev.on('connection.update', async (event) => await ConnectionUpdateEvent(event, client, start));
+    client.ev.on('connection.update', async (event) => await ConnectionUpdateEvent(event, client));
     client.ev.on('messages.upsert', async (messages) => await MessageUpsertEvent(messages, client));
     client.ev.on("groups.upsert", async (event) => await GroupsUpsert(event, client));
     client.ev.on("groups.update", async (event) => await GroupsUpdate(event, client));

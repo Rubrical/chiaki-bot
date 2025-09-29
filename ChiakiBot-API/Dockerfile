@@ -34,4 +34,5 @@ EXPOSE 3000
 
 RUN chmod +x docker-entrypoint.sh
 
+ENV TZ=America/Sao_Paulo
 CMD ["./docker-entrypoint.sh"]

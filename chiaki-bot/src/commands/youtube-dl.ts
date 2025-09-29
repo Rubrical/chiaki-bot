@@ -19,17 +19,21 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
     "--restrict-filenames",
     "--max-filesize", `${MAX_MB}M`,
     "-o", outTpl,
-
-    // imprime título real e caminho final
     "--print", "before_dl:TITLE=%(title)s",
     "--print", "after_move:FILE=%(filepath)s",
+
+    "--extractor-args", "youtube:player_client=android",
+    "--concurrent-fragments", "1",
+    "--http-chunk-size", "10M",
+    "--force-ipv4",
+    "--retries", "infinite",
+    "--fragment-retries", "infinite",
+    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
   ];
 
   if (audio) {
-    // Extrai ÁUDIO e converte para MP3 (requer ffmpeg instalado e no PATH)
     args.push("-x", "--audio-format", "mp3", "--audio-quality", "0");
   } else {
-    // Baixa VÍDEO em MP4 (360p máx para caber no limite)
     args.push(
       "-f",
       `mp4[filesize<${MAX_MB}M]/mp4[height<=360][ext=mp4]/bv*[height<=360][ext=mp4]+ba[ext=m4a]`,
@@ -45,26 +49,18 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   child.stderr.on("data", d => (stderr += d.toString()));
 
   await new Promise<void>((resolve, reject) => {
-    child.on("close", (code) => {
-      if (code === 0) return resolve();
-      reject(new Error(`yt-dlp exit ${code}: ${stderr || stdout}`));
-    });
+    child.on("close", (code) => code === 0 ? resolve() : reject(new Error(`yt-dlp exit ${code}: ${stderr || stdout}`)));
   });
 
-  const lines = stdout
-    .split(/\r?\n/)
-    .map(s => s.trim())
-    .filter(Boolean);
-
+  const lines = stdout.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   let title = "YouTube";
   let filePath: string | undefined;
 
   for (const line of lines) {
-    if (line.startsWith("TITLE=")) title = line.substring("TITLE=".length);
-    else if (line.startsWith("FILE=")) filePath = line.substring("FILE=".length);
+    if (line.startsWith("TITLE=")) title = line.substring(6);
+    else if (line.startsWith("FILE=")) filePath = line.substring(5);
   }
 
-  // fallback: se o FILE não veio ou não existe, procurar a extensão esperada no tmpDir
   if (!filePath || !(await exists(filePath))) {
     const files = await fs.readdir(tmpDir);
     const targetExt = audio ? ".mp3" : ".mp4";
@@ -73,7 +69,7 @@ async function runYtDlp(url: string, audio = false): Promise<{ filePath: string;
   }
 
   if (!filePath || !(await exists(filePath))) {
-    throw new Error(`Falha ao localizar o arquivo baixado. Saída:\n${stdout}\nErros:\n${stderr}`);
+    throw new Error(`Falha ao localizar o arquivo baixado.\nSaída:\n${stdout}\nErros:\n${stderr}`);
   }
 
   const stat = await fs.stat(filePath);
@@ -89,7 +85,6 @@ async function exists(p: string) {
 }
 
 function toMp3FileName(title: string) {
-  // Garante um nome simples e com .mp3
   const base = title.replace(/[^\w\s.-]+/g, "_").trim().slice(0, 80) || "audio";
   return base.endsWith(".mp3") ? base : `${base}.mp3`;
 }
@@ -108,7 +103,6 @@ const youtubeDlCommand: IChiakiCommand = {
       return M.reply("❌ Forneça a URL de um vídeo do YouTube ou um termo para busca.");
     }
 
-    // flag é array de strings
     const audio = Array.isArray(flag) && flag.some(f => /^(--)?(mp3|audio)$/i.test(f));
 
     await M.reply(audio ? "🎵 Baixando áudio em MP3, aguarde..." : "🎬 Baixando vídeo em MP4, aguarde...");
@@ -137,8 +131,8 @@ const youtubeDlCommand: IChiakiCommand = {
           M.from,
           {
             audio: buffer,
-            mimetype: "audio/mpeg",           // <- MIME correto para MP3
-            fileName: toMp3FileName(title),   // <- garante .mp3
+            mimetype: "audio/mpeg",
+            fileName: toMp3FileName(title),
           },
           { quoted: M }
         );
@@ -157,7 +151,8 @@ const youtubeDlCommand: IChiakiCommand = {
       });
     } catch (error: any) {
       logger.error("Erro no comando YouTube:", error);
-      await M.reply("❌ Erro ao baixar/enviar. Tente outro link/termo ou um arquivo menor que 100MB.");
+
+      await M.reply("❌ Erro ao baixar e enviar. Consulte o administrador.");
     }
   },
 };

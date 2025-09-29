@@ -5,11 +5,9 @@ import path from "path";
 import os from "os";
 import yts from "yt-search";
 import logger from "../logger";
-import { CookieFileNotFoundError } from '../types/cookie-file-not-found';
 
 const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
 const MAX_MB = 100;
-// const COOKIES_FILE_PATH = path.join(process.cwd(), "cookies.txt");
 
 async function runYtDlp(url: string, audio = false): Promise<{ filePath: string; title: string }> {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "yt-"));
@@ -154,12 +152,7 @@ const youtubeDlCommand: IChiakiCommand = {
     } catch (error: any) {
       logger.error("Erro no comando YouTube:", error);
 
-      if (error instanceof CookieFileNotFoundError) {
-        await M.reply("❌ Erro ao buscar informações. Configure os cookies de acesso!");
-        return;
-      }
-
-      await M.reply("❌ Erro ao baixar/enviar. Tente outro link/termo ou um arquivo menor que 100MB.");
+      await M.reply("❌ Erro ao baixar e enviar. Consulte o administrador.");
     }
   },
 };

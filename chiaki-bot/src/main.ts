@@ -21,7 +21,12 @@ async function getConfig(): Promise<ChiakiConfig> {
     return {
         name: process.env.BOT_NAME || 'ChiakiBot',
         prefix: process.env.PREFIX || '/',
-        startTime: new Date().toLocaleDateString('pt-BR'),
+        startTime: new Date().toLocaleDateString('pt-BR', {
+          timeZone: "America/Sao_Paulo",
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false
+        }),
         botRoot: await RootService.getRootName(),
     }
 }
@@ -59,7 +64,6 @@ const start = async (): Promise<ChiakiClient | void> => {
 
   logger.info("[init] registrando eventos");
   client.ev.on('creds.update', saveCreds);
-  client.ev.on('connection.update', (u) => logger.info(`conn.update: ${u.connection ?? ""}`));
   client.ev.on('connection.update', async (event) => await ConnectionUpdateEvent(event, client, start));
   client.ev.on('messages.upsert', async (m) => await MessageUpsertEvent(m, client));
   client.ev.on("groups.upsert", async (e) => await GroupsUpsert(e, client));

@@ -1,4 +1,4 @@
-import makeWASocket, { fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
+import makeWASocket from '@whiskeysockets/baileys';
 import P from 'pino';
 import logger from './logger';
 import * as utils from './utils/utils';
@@ -13,11 +13,16 @@ import { CacheManager } from "./adapters/cache";
 import { setupWorker } from "./jobs/worker";
 import { chiakiCustomAuth } from './adapters/chiaki-custom-auth';
 import { startWebSocket } from './servers/web-socket';
+import { RootService } from './services/root-service';
+import { startWebServer } from './servers/aux-web-server';
+import { sleep } from './utils/sleep';
 
-function getConfig(): ChiakiConfig {
+async function getConfig(): Promise<ChiakiConfig> {
     return {
-        name: 'ChiakiBot',
+        name: process.env.BOT_NAME || 'ChiakiBot',
         prefix: process.env.PREFIX || '/',
+        startTime: new Date().toLocaleDateString('pt-BR'),
+        botRoot: await RootService.getRootName(),
     }
 }
 
@@ -40,13 +45,15 @@ const start = async (): Promise<ChiakiClient | void> => {
       cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
     }) as ChiakiClient;
   } catch (e) {
-    logger.error("erro ao criar makeWASocket");
+    logger.error("erro ao criar socket de conexão");
     logger.error(JSON.stringify(e));
     throw e;
   }
 
+  await sleep(15_000);
+
   client.utils = utils;
-  client.config = getConfig();
+  client.config = await getConfig();
   client.cmd = new Map();
   client.log = logger;
 
@@ -59,7 +66,9 @@ const start = async (): Promise<ChiakiClient | void> => {
   client.ev.on("groups.update", async (e) => await GroupsUpdate(e, client));
   client.ev.on('group-participants.update', async (e) => await GroupParticipantsEvent(e, client));
 
+  logger.info("[init] Iniciando serviços web");
   startWebSocket();
+  startWebServer(client);
 
   logger.info("[init] checando dependências externas com timeout de 3 segundos");
 
@@ -75,6 +84,7 @@ const start = async (): Promise<ChiakiClient | void> => {
     logger.warn("yt-dlp check falhou/timeout. Verifique binário. Continuando mesmo assim.");
   }
 
+  logger.info("[init] iniciado worker de comandos")
   await setupWorker(client);
   setInterval(AdvertenceService.cleanAll, sevenDays);
 

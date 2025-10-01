@@ -10,7 +10,9 @@ import { getExtensionFromUrl, verifyIfYtDlpIsInstalled } from "../utils/utils";
  */
 export type ChiakiConfig = {
     name: string;
-    prefix: string
+    prefix: string;
+    startTime: string;
+    botRoot: string;
 }
 /**
  * Socket de comunicação com o Whatsapp do Baileys extendido
@@ -29,6 +31,8 @@ export type ChiakiClient = WASocket & {
   log: Logger;
   config: ChiakiConfig;
   cmd: Map<string, IChiakiCommand>;
+  startTime: string;
+  botRoot: string;
 };
 
 /**

@@ -30,6 +30,9 @@ export class RootService {
   }
 
   async create(createRootDto: RootDto) {
+    const rootExists = await this.rootRepository.count();
+    if (rootExists > 1) throw new BadRequestException('Já existe um usuário root');
+
     const hasehdPassword = await this.bcrypt.createNewPassword(createRootDto.password);
     const newRoot = this.rootRepository.create({
       login: createRootDto.username,
@@ -65,6 +68,13 @@ export class RootService {
 
     const token = await this.generateJwt({ sub: findedUser.id, username: findedUser.login });
     return { token: token };
+  }
+
+  async getRootName(): Promise<string> {
+    const root = await this.rootRepository.find({ take: 1 });
+    if (!root) throw new NotFoundException('Nenhum root cadastrado');
+
+    return root[0].login;
   }
 
   private async generateJwt(payload: Payload) {

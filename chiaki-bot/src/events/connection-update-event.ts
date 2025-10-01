@@ -4,12 +4,12 @@ import logger from "../logger";
 import { ChiakiClient } from "../types/types";
 import { loadCommands } from "../commands/commands";
 import { startWebSocket, io, stopWebSocket } from "../servers/web-socket";
+import { sleep } from "../utils/sleep";
 
 let attempts = 0;
 let restarting = false;
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 15;
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const isBoom = (err: unknown): err is Boom => {
     return typeof err === 'object' && err !== null && 'isBoom' in err;
 };

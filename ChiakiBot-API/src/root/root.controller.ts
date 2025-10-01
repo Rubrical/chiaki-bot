@@ -12,6 +12,11 @@ export class RootController {
     return await this.rootService.checkIfExists();
   }
 
+  @Get('get-root-name')
+  async getRootName() {
+    return await this.rootService.getRootName();
+  }
+
   @Post('new')
   async create(@Body() createRootDto: RootDto) {
     return await this.rootService.create(createRootDto);

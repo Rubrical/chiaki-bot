@@ -6,7 +6,7 @@ import { serialize } from "../utils/serialize";
 import { valkeyConnectionOpts } from "./valkey-connection-opts";
 
 export async function setupWorker(client: ChiakiClient) {
-  logger.info('[WORKER] Iniciando o worker da fila de comandos');
+  logger.info('[WORKER] Fila de comandos iniciada');
 
   new Worker<ICommandJob>(QUEUE_NAME,
     async (job: Job<ICommandJob>) => {

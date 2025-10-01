@@ -12,11 +12,9 @@ services:
       - PREFIX=/
       - BACKEND_URL=http://api:3000/api/
       - VALKEY_HOST=valkey
+      - BOT_NAME=ChiakiBot
     volumes:
-      - ./sessao:/app/session:rw
       - ./logs:/app/logs:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - valkey
     restart: always
@@ -32,8 +30,6 @@ services:
     volumes:
       - ./banco:/usr/src/app/database:rw
       - ./uploads:/usr/src/app/uploads:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
       - NODE_ENV=production
     restart: always

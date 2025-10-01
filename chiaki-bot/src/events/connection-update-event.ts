@@ -9,7 +9,6 @@ import { sleep } from "../utils/sleep";
 let attempts = 0;
 let restarting = false;
 const MAX_ATTEMPTS = 15;
-
 const isBoom = (err: unknown): err is Boom => {
     return typeof err === 'object' && err !== null && 'isBoom' in err;
 };

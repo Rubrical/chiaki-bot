@@ -32,6 +32,8 @@ async function getConfig(): Promise<ChiakiConfig> {
 }
 
 const start = async (): Promise<ChiakiClient | void> => {
+  await sleep(15_000);
+
   logger.info("[init] criando redis conexão");
   const redis = CacheManager.connection();
 
@@ -54,8 +56,6 @@ const start = async (): Promise<ChiakiClient | void> => {
     logger.error(JSON.stringify(e));
     throw e;
   }
-
-  await sleep(15_000);
 
   client.utils = utils;
   client.config = await getConfig();

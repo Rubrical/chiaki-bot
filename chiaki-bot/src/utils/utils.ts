@@ -12,43 +12,35 @@ export const extractUrls = (content: string): string[] =>
 
 export const removeDuplicates = <T>(arr: T[]): T[] => [...new Set(arr)]
 
-export const verifyIfFFMPEGisInstalled = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const proc = spawn('ffmpeg', ['-version'])
-    proc.on('error', () => resolve(false))
-    proc.stdout.on('data', data => {
-      if (data.toString().toLowerCase().includes('ffmpeg'))
-        resolve(true)
-    })
-    proc.stderr.on('data', data => {
-      if (data.toString().toLowerCase().includes('ffmpeg'))
-        resolve(true)
-    })
-    proc.on('close', code => {
-      if (code !== 0) resolve(false)
-    })
-  })
-};
+function withTimeout<T>(p: Promise<T>, ms = 3000): Promise<T> {
+  return new Promise((res, rej) => {
+    const t = setTimeout(() => rej(new Error("timeout")), ms);
 
-export const verifyIfYtDlpIsInstalled = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const proc = spawn('yt-dlp', ['--version']);
-
-    proc.on('error', () => resolve(false));
-    proc.stdout.on('data', data => {
-      if (data.toString().toLowerCase().includes('yt-dlp')) {
-        resolve(true);
-      }
-    });
-    proc.stderr.on('data', data => ({ resolve }) => {
-      if (data.toString().toLowerCase().includes('yt-dlp')) {
-        resolve(true);
-      }
-    });
-    proc.on('close', code => {
-      if (code !== 0) resolve(false);
-    });
+    p.then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); });
   });
+}
+
+export function verifyIfFFMPEGisInstalled(): Promise<boolean> {
+  return withTimeout(new Promise<boolean>((resolve) => {
+    let settled = false;
+    const done = (v: boolean) => { if (!settled) { settled = true; resolve(v); proc.kill(); } };
+    const proc = spawn(process.env.FFMPEG_BIN || "ffmpeg", ["-version"]);
+
+    proc.on("error", () => done(false));
+    proc.on("close", code => done(code === 0));
+  }), 3000).catch(() => false);
+}
+
+export function verifyIfYtDlpIsInstalled(): Promise<boolean> {
+  return withTimeout(new Promise<boolean>((resolve) => {
+    let settled = false;
+    const done = (v: boolean) => { if (!settled) { settled = true; resolve(v); proc.kill(); } };
+    const bin = process.env.YT_DLP_BIN || "/usr/local/bin/yt-dlp";
+    const proc = spawn(bin, ["--version"], { env: { ...process.env, YT_DLP_NO_UPDATE: "1" } });
+
+    proc.on("error", () => done(false));
+    proc.on("close", code => done(code === 0));
+  }), 3000).catch(() => false);
 }
 
 export const validateRemoteJid = (remoteJid: string): JidInfo => {

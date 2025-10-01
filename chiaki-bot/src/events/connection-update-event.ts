@@ -5,7 +5,11 @@ import { ChiakiClient } from "../types/types";
 import { loadCommands } from "../commands/commands";
 import { startWebSocket, io, stopWebSocket } from "../servers/web-socket";
 
+let attempts = 0;
+let restarting = false;
+const MAX_ATTEMPTS = 5;
 
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const isBoom = (err: unknown): err is Boom => {
     return typeof err === 'object' && err !== null && 'isBoom' in err;
 };
@@ -13,6 +17,7 @@ const isBoom = (err: unknown): err is Boom => {
 export async function ConnectionUpdateEvent(
     event: Partial<ConnectionState>,
     client: ChiakiClient,
+    startFn: () => Promise<ChiakiClient | void>,
 ) {
     const { qr,  connection, lastDisconnect } = event;
 
@@ -23,29 +28,61 @@ export async function ConnectionUpdateEvent(
     }
 
     if (connection === "open") {
+        attempts = 0;
+        restarting = false;
         io.emit("status", "online");
         stopWebSocket();
+
+        if (!client.cmd || client.cmd.size === 0 ) {
+            client.log.info("Carregando comandos");
+            loadCommands(client);
+        } else {
+            client.log.info("comandos já carregados");
+        }
+        return;
     }
 
-    if (connection === "close" || connection === "connecting") {
+    if (connection === "connecting") {
         io.emit("status", "offline");
     }
 
     if (connection === "close") {
-        const shouldReconnect =
-            isBoom(lastDisconnect?.error) &&
-            lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
+        io.emit("status", "offline");
 
-        if (shouldReconnect) {
-            logger.warn(`Conexão encerrada por motivo: ${lastDisconnect?.error?.message}. Reconectando...`);
-        } else {
-            logger.error("Conexão encerrada permanentemente (logged out). Abortando.");
+        const reason = isBoom(lastDisconnect?.error)
+        ? lastDisconnect!.error.output.statusCode
+        : undefined;
+
+        const shouldReconnect =
+        reason !== DisconnectReason.loggedOut &&
+        reason !== DisconnectReason.multideviceMismatch;
+
+        if (!shouldReconnect) {
+            logger.error("Sessão inválida ou deslogada. Abortando.");
             process.exit(1);
         }
-    }
 
-    if (connection === "open") {
-        logger.info("Chiaki Bot! De pé e operante!");
-        loadCommands(client);
+        if (restarting) {
+            logger.warn("Reinício já em progresso. Ignorando sinal extra.");
+            return;
+        }
+
+        if (attempts >= MAX_ATTEMPTS) {
+            logger.error("Limite de tentativas excedido. Abortando.");
+            process.exit(1);
+        }
+
+        restarting = true;
+        attempts += 1;
+
+        const backoffMs = Math.min(1000 * 2 ** (attempts - 1), 15000);
+        logger.warn(
+            `Conexão encerrada: ${lastDisconnect?.error?.message ?? "desconhecido"} ` +
+            `(motivo=${reason ?? "?"}). Reiniciando em ${backoffMs}ms [${attempts}/${MAX_ATTEMPTS}]`
+        );
+
+        await sleep(backoffMs);
+        await startFn();
+        restarting = false;
     }
 }

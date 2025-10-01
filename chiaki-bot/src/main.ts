@@ -1,4 +1,4 @@
-import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
+import makeWASocket, { fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
 import P from 'pino';
 import logger from './logger';
 import * as utils from './utils/utils';
@@ -11,6 +11,8 @@ import { GroupsUpdate } from './events/groups-update-event';
 import { AdvertenceService } from './services/advertence-service';
 import { CacheManager } from "./adapters/cache";
 import { setupWorker } from "./jobs/worker";
+import { chiakiCustomAuth } from './adapters/chiaki-custom-auth';
+import { startWebSocket } from './servers/web-socket';
 
 function getConfig(): ChiakiConfig {
     return {
@@ -20,45 +22,63 @@ function getConfig(): ChiakiConfig {
 }
 
 const start = async (): Promise<ChiakiClient | void> => {
-    const { state, saveCreds } = await useMultiFileAuthState('session');
-    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  logger.info("[init] criando redis conexão");
+  const redis = CacheManager.connection();
 
-    const client = makeWASocket({
-        auth: state,
-        logger: P({ level: 'silent' }),
-        qrTimeout: 20 * 1000,
-        shouldSyncHistoryMessage: () => false,
-        cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
+  logger.info("[init] carregando authState");
+  const { state, saveCreds } = await chiakiCustomAuth(redis, "chiaki:auth");
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+  logger.info("[init] criando socket Baileys");
+  let client: ChiakiClient;
+  try {
+    client = makeWASocket({
+      auth: state,
+      logger: P({ level: 'silent' }),
+      qrTimeout: 20_000,
+      shouldSyncHistoryMessage: () => false,
+      cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
     }) as ChiakiClient;
+  } catch (e) {
+    logger.error("erro ao criar makeWASocket");
+    logger.error(JSON.stringify(e));
+    throw e;
+  }
 
-    client.utils = utils;
-    client.config = getConfig();
-    client.cmd = new Map();
-    client.log = logger;
+  client.utils = utils;
+  client.config = getConfig();
+  client.cmd = new Map();
+  client.log = logger;
 
-    const isInstalledFFMPEG = await client.utils.verifyIfFFMPEGisInstalled();
-    const isInstalledYtDlp = await client.utils.verifyIfFFMPEGisInstalled();
-    if (!isInstalledFFMPEG) {
-        logger.warn('O FFMPEG não está instalado, instale-o!');
-        process.exit(1);
-    }
+  logger.info("[init] registrando eventos");
+  client.ev.on('creds.update', saveCreds);
+  client.ev.on('connection.update', (u) => logger.info(`conn.update: ${u.connection ?? ""}`));
+  client.ev.on('connection.update', async (event) => await ConnectionUpdateEvent(event, client, start));
+  client.ev.on('messages.upsert', async (m) => await MessageUpsertEvent(m, client));
+  client.ev.on("groups.upsert", async (e) => await GroupsUpsert(e, client));
+  client.ev.on("groups.update", async (e) => await GroupsUpdate(e, client));
+  client.ev.on('group-participants.update', async (e) => await GroupParticipantsEvent(e, client));
 
-    if (!isInstalledYtDlp) {
-      logger.warn('O yt-dlp não está instalado, instale-o!');
-      process.exit(1);
-    }
+  startWebSocket();
 
-    client.ev.on('creds.update', saveCreds);
-    client.ev.on('connection.update', async (event) => await ConnectionUpdateEvent(event, client));
-    client.ev.on('messages.upsert', async (messages) => await MessageUpsertEvent(messages, client));
-    client.ev.on("groups.upsert", async (event) => await GroupsUpsert(event, client));
-    client.ev.on("groups.update", async (event) => await GroupsUpdate(event, client));
-    client.ev.on('group-participants.update', async (event) => await GroupParticipantsEvent(event, client));
+  logger.info("[init] checando dependências externas com timeout de 3 segundos");
 
-    await setupWorker(client);
-    setInterval(AdvertenceService.cleanAll, sevenDays);
+  try {
+    await client.utils.verifyIfFFMPEGisInstalled();
+  } catch (e) {
+    logger.warn("FFMPEG check falhou/timeout. Verifique PATH. Continuando mesmo assim.");
+  }
 
-    return client;
+  try {
+    await client.utils.verifyIfYtDlpIsInstalled();
+  } catch (e) {
+    logger.warn("yt-dlp check falhou/timeout. Verifique binário. Continuando mesmo assim.");
+  }
+
+  await setupWorker(client);
+  setInterval(AdvertenceService.cleanAll, sevenDays);
+
+  return client;
 };
 
 start().catch(err => logger.error(err));

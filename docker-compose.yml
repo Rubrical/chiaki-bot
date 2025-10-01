@@ -39,7 +39,7 @@ services:
     restart: always
 
   chiaki-web-panel:
-    image: ghcr.io/rubrical/chiaki-web-painel:latest
+    image: chiaki-web-painel:latest
     container_name: chiaki-web-painel
     build:
       context: ./chiaki-web-painel
@@ -54,9 +54,4 @@ services:
     ports:
       - "6379:6379"
     restart: always
-    command: valkey-server #--requirepass "123"
-    healthcheck:
-      test: ["CMD", "valkey-cli", "-a", "123", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+    command: valkey-server

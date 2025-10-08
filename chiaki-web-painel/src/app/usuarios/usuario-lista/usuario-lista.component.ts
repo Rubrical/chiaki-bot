@@ -54,4 +54,48 @@ export class UsuarioListaComponent implements OnInit {
   consult(userId: string): void {
     this.router.navigate(['usuario/usuario-consulta/', userId]);
   }
+
+  isNumber(value: any): value is number {
+    return typeof value === 'number';
+  }
+
+  isString(value: any): value is string {
+    return typeof value === 'string';
+  }
+
+  getPages(): (number | string)[] {
+    const totalPages = this.totalPages;
+    const currentPage = this.pageNumber;
+    const maxPages = 5;
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= maxPages + 2) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
+    }
+
+    pages.push(1);
+
+    if (currentPage > maxPages - 2) pages.push('...');
+
+    let startPage = Math.max(2, currentPage - 2);
+    let endPage = Math.min(totalPages - 1, currentPage + 2);
+
+    if (currentPage <= 3) {
+      startPage = 2;
+      endPage = maxPages - 1;
+    }
+
+    if (currentPage >= totalPages - 2) {
+      startPage = totalPages - maxPages + 2;
+      endPage = totalPages - 1;
+    }
+
+    for (let i = startPage; i <= endPage; i++) pages.push(i);
+
+    if (currentPage < totalPages - (maxPages - 3)) pages.push('...');
+
+    pages.push(totalPages);
+    return pages;
+  }
 }

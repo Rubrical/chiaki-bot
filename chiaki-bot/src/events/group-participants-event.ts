@@ -20,11 +20,11 @@ export async function GroupParticipantsEvent(
         event.participants.some(participant => participant.split(":")[0] === botJid);
 
     if (wasRemoved) {
-        client.log.info(`Bot foi removido do grupo de id ${event.id}`);
+        client.log.info(`[Group Participant Event] Bot foi removido do grupo de id ${event.id}`);
         try {
             await GroupsService.inactivateGroup(event.id);
         } catch (err) {
-            client.log.warn(`Grupo "${event.id}" não desativado (backend offline tolerado)`);
+            client.log.warn(`[Group Participant Event] Grupo "${event.id}" não desativado (backend offline tolerado)`);
         }
         return;
     }
@@ -33,7 +33,7 @@ export async function GroupParticipantsEvent(
     try {
         messageStatus = await GroupsService.verifyMessageStatus(event.id);
     } catch (err) {
-        client.log.warn("[Backend offline tolerado] Erro ao verificar status de mensagens de grupo");
+        client.log.warn("[Group Participant Event] Erro ao verificar status de mensagens de grupo");
     }
     let groupMetadata = await CacheManager.get<GroupMetadata>(`groups:${event.id}`);
 
@@ -54,17 +54,17 @@ export async function GroupParticipantsEvent(
             try {
                 const ban = await BanService.findOne({ groupRemoteJid: event.id, userRemoteJid: parsedJid });
                 if (ban) {
-                    client.log.info(`Usuário ${parsedJid} banido anteriormente. Removendo do grupo...`);
+                    client.log.info(`[Group Participant Event] Usuário ${parsedJid} banido anteriormente. Removendo do grupo...`);
                     wasUserBanned = true;
                     try {
                         await client.groupParticipantsUpdate(event.id, [participant], "remove");
                     } catch (err) {
-                        client.log.error(`Erro ao remover usuário ${participant}:`, err);
+                        client.log.error(`[Group Participant Event] Erro ao remover usuário ${participant}:`, err);
                     }
                     return;
                 }
             } catch (err) {
-                client.log.warn("[Backend offline tolerado] Erro ao verificar banimento");
+                client.log.warn("[Group Participant Event] Erro ao verificar banimento");
             }
 
             try {
@@ -85,7 +85,7 @@ export async function GroupParticipantsEvent(
                     });
                 }
             } catch (err) {
-                client.log.warn("[Backend offline tolerado] Erro ao registrar novo usuário no grupo");
+                client.log.warn("[Group Participant Event] Erro ao registrar novo usuário no grupo");
             }
 
             try {
@@ -102,7 +102,7 @@ export async function GroupParticipantsEvent(
                     }
                 }
             } catch (err) {
-                client.log.warn("[Backend offline tolerado] Erro ao buscar mensagem de boas-vindas");
+                client.log.warn("[Group Participant Event]  Erro ao buscar mensagem de boas-vindas");
             }
         }
     } else if (event.action === "remove") {
@@ -113,7 +113,7 @@ export async function GroupParticipantsEvent(
             try {
                 await GroupsService.inactivateUserFromGroup({ groupId: event.id, userId: parsedJid });
             } catch (err) {
-                client.log.warn(`Usuário ${parsedJid} não desativado (backend offline)`);
+                client.log.warn(`[Group Participant Event] Usuário ${parsedJid} não desativado (backend offline)`);
             }
 
             try {
@@ -130,7 +130,7 @@ export async function GroupParticipantsEvent(
                     }
                 }
             } catch (err) {
-                client.log.warn("[Backend offline tolerado] Erro ao buscar mensagem de despedida");
+                client.log.warn("[Group Participant Event] Erro ao buscar mensagem de despedida");
             }
         }
     } else if (event.action === "promote" || event.action === "demote") {
@@ -146,7 +146,7 @@ export async function GroupParticipantsEvent(
                     });
                 }
             } catch (err) {
-                client.log.warn(`[Backend offline tolerado] Erro ao atualizar cargo de ${parsedJid}`);
+                client.log.warn(`[Group Participant Event] Erro ao atualizar cargo de ${parsedJid}`);
             }
         }
     }
@@ -189,7 +189,7 @@ export async function GroupParticipantsEvent(
         } catch(err) {
             const now = new Date(Date.now());
             await client.sendMessage(event.id, { text: `Um erro inesperado ocorreu!\n Servidor interno fora do ar ou outro erro.\n Horário do erro: ${now.toString()}`});
-            client.log.error(`${JSON.stringify(err)}`);
+            client.log.error(`[Group Participant Event] ${JSON.stringify(err)}`);
         }
     }
 }

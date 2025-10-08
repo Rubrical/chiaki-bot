@@ -38,7 +38,7 @@ const addAdvertence: IChiakiCommand = {
             await M.reply(`@${remoteJid} foi advertido. Motivo:\n${reason}`);
         } else {
             await M.reply("Erro ao advertir o usuário.");
-            client.log.error(`Erro ao adicionar advertência para ${mentionedUser} no grupo ${M.from}`);
+            client.log.error(`[Comandos] Erro ao adicionar advertência para ${mentionedUser} no grupo ${M.from}`);
         }
     }
 }

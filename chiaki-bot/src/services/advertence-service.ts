@@ -16,7 +16,7 @@ export const AdvertenceService = {
             .then((data) => data)
             .catch((error) => {
                 if (error.code === 409) return error.message;
-                logger.error(`${JSON.stringify(error)}`);
+                logger.error(`[Advertence Service] ${JSON.stringify(error)}`);
                 return null
             });
     },
@@ -24,15 +24,15 @@ export const AdvertenceService = {
         return await api.patch<boolean>(routes.removeAdvertence, req)
         .then((data) => data)
         .catch((error) => {
-            logger.warn(`Erro ao remover advertência ${JSON.stringify(error)}`);
+            logger.warn(`[Advertence Service] Erro ao remover advertência ${JSON.stringify(error)}`);
             if (error.code === 500) return error.message;
             return null;
         });
     },
     cleanAll: async () => {
         return await api.post<string>(routes.removedExpiredAdvertences)
-            .then((data) => logger.info(`${data}`))
-            .catch((error) => logger.warn(`Erro ao limpar todas as advertências ${JSON.stringify(error)}`));
+            .then((data) => logger.info(`[Advertence Service] ${data}`))
+            .catch((error) => logger.warn(`[Advertence Service] Erro ao limpar todas as advertências ${JSON.stringify(error)}`));
     },
 }
 

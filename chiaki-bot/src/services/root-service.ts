@@ -8,7 +8,7 @@ export const RootService = {
         return await api.get<string>(`${url}/get-root-name`)
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.error(err.message);
+                logger.error("[Root Service] "+err.message);
                 if (err.code === 404) return "";
             });
     }

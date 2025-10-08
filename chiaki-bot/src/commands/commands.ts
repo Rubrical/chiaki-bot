@@ -70,7 +70,7 @@ const commands: Array<IChiakiCommand> = [
 export const loadCommands = (client: ChiakiClient): ChiakiClient => {
     commands.forEach((x) => {
         client.cmd.set(x.command.name, x);
-        client.log.info(`Comando ${x.command.name} carregado com sucesso`);
+        client.log.info(`[Comandos] Comando ${x.command.name} carregado com sucesso`);
     });
     return client;
 }

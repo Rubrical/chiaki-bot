@@ -9,15 +9,10 @@ export const startWebServer = (client: ChiakiClient) => {
     app.use(express.json());
 
     app.get('/status', (req: Request, res: Response) => {
-        res.status(200).json({
-            status: 'online',
-            nomeDoBot: client.config.name,
-            horaDeInicio: client.config.startTime,
-            nomeDoDono: client.config.botRoot,
-        });
+        res.status(200).json(client.config);
     });
 
-    app.post('/send-message', async (req, res) => {
+    app.post('/send-private-message', async (req, res) => {
         const { to, message } = req.body;
 
         if (!to || !message) {
@@ -26,13 +21,13 @@ export const startWebServer = (client: ChiakiClient) => {
         }
 
         try {
-            await client.sendMessage(to, { text: message });
-            logger.info(`Mensagem enviada para ${to} via API.`);
+            await client.sendMessage(`${to}@s.whatsapp.net`, { text: message });
+            logger.info(`[Bot-Server] Mensagem enviada para ${to} via API.`);
             res.status(200).json({ success: true, message: 'Mensagem enviada.' });
 
             return;
         } catch (error) {
-            logger.error(`Erro ao enviar mensagem via API: ${error}`);
+            logger.error(`[Bot-Server] Erro ao enviar mensagem via API: ${error}`);
             res.status(500).json({ success: false, error: 'Falha ao enviar mensagem.' });
 
             return;
@@ -41,6 +36,6 @@ export const startWebServer = (client: ChiakiClient) => {
 
 
     app.listen(port, "0.0.0.0", () => {
-        logger.info(`Servidor HTTP rodando na porta ${port}!`);
+        logger.info(`[Bot-Server] Servidor HTTP rodando na porta ${port}!`);
     });
 };

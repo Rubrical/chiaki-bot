@@ -136,8 +136,8 @@ async function pngConvertion(mediaBuffer: Buffer): Promise<Buffer> {
 }
 
 async function editImage(buffer: Buffer, type: StickerType): Promise<Buffer> {
-  logger.error(`${JSON.stringify(buffer)}`);
-  logger.error(`${JSON.stringify(type)}`);
+  logger.error(`[sticker utils] ${JSON.stringify(buffer)}`);
+  logger.error(`[sticker utils] ${JSON.stringify(type)}`);
 
   const image = await jimp.read(buffer);
   if (type === 'contain') image.contain(512, 512);

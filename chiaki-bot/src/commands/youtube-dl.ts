@@ -150,7 +150,7 @@ const youtubeDlCommand: IChiakiCommand = {
         try { await fs.rmdir(dir); } catch {}
       });
     } catch (error: any) {
-      logger.error("Erro no comando YouTube:", error);
+      logger.error("[Comandos] Erro no comando YouTube:", error);
 
       await M.reply("❌ Erro ao baixar e enviar. Consulte o administrador.");
     }

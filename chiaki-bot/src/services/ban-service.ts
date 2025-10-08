@@ -25,7 +25,7 @@ export const BanService = {
         return await api.patch<boolean>(routes.removeBan(), { userRemoteJid: remoteJid, groupRemoteJid: groupId })
             .then((data) => data)
             .catch((error: ChiakiError) => {
-                logger.warn(`Erro ao remover banimento ${JSON.stringify(error)}`);
+                logger.warn(`[Ban Service] Erro ao remover banimento ${JSON.stringify(error)}`);
                 if (error.code === 500) return error.message;
                 return null;
             });
@@ -35,7 +35,7 @@ export const BanService = {
         return await api.get<Ban>(routes.findBan, { params: req })
             .then((data) => data)
             .catch((error: ChiakiError) => {
-                logger.warn(`Erro ao buscar banimento: ${JSON.stringify(error)}`);
+                logger.warn(`[Ban Service] Erro ao buscar banimento: ${JSON.stringify(error)}`);
                 return null;
             });
     },
@@ -44,7 +44,7 @@ export const BanService = {
         return await api.get<BannedListDto>(routes.findBannedUsersFromGroup(groupRemoteJid))
             .then((data) => data)
             .catch((error: ChiakiError) => {
-                logger.warn(`Erro ao listar usuários banidos: ${JSON.stringify(error)}`);
+                logger.warn(`[Ban Service] Erro ao listar usuários banidos: ${JSON.stringify(error)}`);
                 return null;
             });
     }

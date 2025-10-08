@@ -57,7 +57,7 @@ async function downloadMedia(message: proto.IMessage): Promise<Buffer> {
     
         return Buffer.concat(bufferArray);
     } catch (error) {
-        logger.error(`Erro ao baixar mídia: ${JSON.stringify(error)}`);
+        logger.error(`[Serialize] Erro ao baixar mídia: ${JSON.stringify(error)}`);
         return Buffer.from([]);
     }
 }

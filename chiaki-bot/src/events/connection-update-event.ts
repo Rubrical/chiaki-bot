@@ -22,7 +22,7 @@ export async function ConnectionUpdateEvent(
 
     if (qr) {
         startWebSocket();
-        client.log.info("QR Code gerado, enviando para painel web");
+        client.log.info("[Connection Update Event] QR Code gerado, enviando para painel web");
         io.emit("qr", qr);
     }
 
@@ -33,10 +33,10 @@ export async function ConnectionUpdateEvent(
         stopWebSocket();
 
         if (!client.cmd || client.cmd.size === 0 ) {
-            client.log.info("Carregando comandos");
+            client.log.info("[Connection Update Event] Carregando comandos");
             loadCommands(client);
         } else {
-            client.log.info("comandos já carregados");
+            client.log.info("[Connection Update Event] comandos já carregados");
         }
         return;
     }
@@ -57,17 +57,17 @@ export async function ConnectionUpdateEvent(
         reason !== DisconnectReason.multideviceMismatch;
 
         if (!shouldReconnect) {
-            logger.error("Sessão inválida ou deslogada. Abortando.");
+            logger.error("[Connection Update Event] Sessão inválida ou deslogada. Abortando.");
             process.exit(1);
         }
 
         if (restarting) {
-            logger.warn("Reinício já em progresso. Ignorando sinal extra.");
+            logger.warn("[Connection Update Event] Reinício já em progresso. Ignorando sinal extra.");
             return;
         }
 
         if (attempts >= MAX_ATTEMPTS) {
-            logger.error("Limite de tentativas excedido. Abortando.");
+            logger.error("[Connection Update Event] Limite de tentativas excedido. Abortando.");
             process.exit(1);
         }
 
@@ -76,7 +76,7 @@ export async function ConnectionUpdateEvent(
 
         const backoffMs = Math.min(1000 * 2 ** (attempts - 1), 15000);
         logger.warn(
-            `Conexão encerrada: ${lastDisconnect?.error?.message ?? "desconhecido"} ` +
+            `[Connection Update Event] Conexão encerrada: ${lastDisconnect?.error?.message ?? "desconhecido"} ` +
             `(motivo=${reason ?? "?"}). Reiniciando em ${backoffMs}ms [${attempts}/${MAX_ATTEMPTS}]`
         );
 

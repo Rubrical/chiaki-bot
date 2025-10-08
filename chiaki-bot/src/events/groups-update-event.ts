@@ -4,8 +4,8 @@ import { GroupsService } from "../services/group-service";
 import { CacheManager } from "../adapters/cache";
 
 export async function GroupsUpdate(event: Partial<GroupMetadata>[], client: ChiakiClient) {
-    client.log.info("---- Atualização de grupos ----");
-    client.log.info(JSON.stringify(event));
+    client.log.info("[Group Update Event] Atualização de grupos ----");
+    client.log.info("[Group Update Event] "+JSON.stringify(event));
 
     for (const updateEvent of event) {
         const groupId = updateEvent.id;
@@ -18,6 +18,6 @@ export async function GroupsUpdate(event: Partial<GroupMetadata>[], client: Chia
         });
 
         await CacheManager.set(`groups:${groupId}`, metadata, 600);
-        if (!updatedGroup) client.log.warn(`Um erro ocorreu na atualização do grupo ${updateEvent?.subject}`);
+        if (!updatedGroup) client.log.warn(`[Group Update Event] Um erro ocorreu na atualização do grupo ${updateEvent?.subject}`);
     }
 }

@@ -14,7 +14,7 @@ import { setupWorker } from "./jobs/worker";
 import { chiakiCustomAuth } from './adapters/chiaki-custom-auth';
 import { startWebSocket } from './servers/web-socket';
 import { RootService } from './services/root-service';
-import { startWebServer } from './servers/aux-web-server';
+import { startWebServer } from './servers/bot-web-server';
 import { sleep } from './utils/sleep';
 import { GroupsService } from './services/group-service';
 import { UsersService } from './services/user-service';

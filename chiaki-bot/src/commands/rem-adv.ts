@@ -36,7 +36,7 @@ const removeAdvertence: IChiakiCommand = {
             await M.reply("Advertência removida com sucesso.");
         } else {
             await M.reply("Erro ao remover a advertência.");
-            client.log.error(`Erro ao remover advertência para ${mentionedUser} no grupo ${M.from}`);
+            client.log.error(`[Comandos] Erro ao remover advertência para ${mentionedUser} no grupo ${M.from}`);
         }
     }
 };

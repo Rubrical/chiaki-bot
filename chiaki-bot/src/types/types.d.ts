@@ -12,7 +12,11 @@ export type ChiakiConfig = {
     name: string;
     prefix: string;
     startTime: string;
+    runningTime: string;
     botRoot: string;
+    environment: string;
+    groupsCount: number;
+    registeredMembers: number;
 }
 /**
  * Socket de comunicação com o Whatsapp do Baileys extendido

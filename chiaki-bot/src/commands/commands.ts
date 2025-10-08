@@ -4,6 +4,7 @@ import addImg from "./add-img";
 import atAdeus from "./at-adeus";
 import atBv from "./at-bv";
 import banUser from "./ban";
+import botStatus from "./bot-status";
 import chance from "./chance";
 import deleteMessage from "./delete";
 import divorce from "./divorce";
@@ -62,7 +63,8 @@ const commands: Array<IChiakiCommand> = [
     chance,
     renameStickerCommand,
     toMediaCommand,
-    youtubeDlCommand
+    youtubeDlCommand,
+    botStatus
 ];
 
 export const loadCommands = (client: ChiakiClient): ChiakiClient => {

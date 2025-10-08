@@ -11,6 +11,7 @@ const routes = {
     getUser: `${url}/get-user`,
     newAdmin: `${url}/admin`,
     updateUser: `${url}/update-user`,
+    getCount: `${url}/get-count`,
 }
 
 
@@ -77,7 +78,15 @@ export const UsersService = {
                 if (err.code === 404) return null; //Usuário não cadastrado no banco
                 return false;
             });
-    }
+    },
+    getCount: async () => {
+        return await api.get<number>(routes.getCount)
+            .then((data) => data)
+            .catch((err:ChiakiError) => {
+                logger.warn(err);
+                return 0;
+            });
+    },
 };
 
 enum UserRoleEnum {

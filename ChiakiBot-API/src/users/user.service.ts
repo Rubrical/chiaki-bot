@@ -240,4 +240,8 @@ export class UserService {
 
     return await this.userRepository.save(existingUser);
   }
+
+  async getUsersCount(): Promise<number> {
+    return await this.userRepository.count();
+  }
 }

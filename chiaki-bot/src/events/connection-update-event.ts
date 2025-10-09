@@ -5,6 +5,7 @@ import { ChiakiClient } from "../types/types";
 import { loadCommands } from "../commands/commands";
 import { startWebSocket, io, stopWebSocket } from "../servers/web-socket";
 import { sleep } from "../utils/sleep";
+import { CacheManager } from "../adapters/cache";
 
 let attempts = 0;
 let restarting = false;
@@ -52,13 +53,22 @@ export async function ConnectionUpdateEvent(
         ? lastDisconnect!.error.output.statusCode
         : undefined;
 
-        const shouldReconnect =
-        reason !== DisconnectReason.loggedOut &&
-        reason !== DisconnectReason.multideviceMismatch;
+        const shouldReconnect = reason !== DisconnectReason.multideviceMismatch;
 
         if (!shouldReconnect) {
-            logger.error("[Connection Update Event] Sessão inválida ou deslogada. Abortando.");
+            logger.error("[Connection Update Event] Sessão inválida. Abortando.");
             process.exit(1);
+        }
+
+        if (reason === DisconnectReason.loggedOut) {
+            attempts = 0;
+            restarting = false;
+
+            logger.warn("[Connection Update Event] loggedOut detectado. Limpando estado e reiniciando para novo QR.");
+
+            await CacheManager.flushPattern("chiaki:auth*");
+            await startFn();
+            return;
         }
 
         if (restarting) {

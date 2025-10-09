@@ -14,7 +14,7 @@ export class MainComponent implements OnInit {
   authService = inject(AuthService);
   toastService = inject(ToastService);
   navigationLinks = [
-    { label: 'Ler QR Code', route: '/qrcode' },
+    { label: 'Configurações do Bot', route: '/qrcode' },
     { label: 'Grupos', route: '/grupos-lista' },
     { label: 'Usuários', route: 'usuario/usuario-lista'},
     { label: 'Advertências', route: 'advertencia/advertencia-lista' },

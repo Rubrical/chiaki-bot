@@ -28,18 +28,17 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
     try {
         remoteJid = client.utils.validateRemoteJid(sender).phoneNumber;
     } catch (err) {
-        client.log.warn("Erro ao validar remoteJid", err);
+        client.log.warn("[Messages Upsert Event] Erro ao validar remoteJid", err);
         return;
     }
 
     const isCommand = body.startsWith(client.config.prefix);
 
-    // Processos relacionados ao backend, mas tolerantes a falhas
     try {
         const user = await UsersService.getUser(remoteJid);
 
         if (user === false) {
-            client.log.warn(`Aviso: erro em getUser`);
+            client.log.warn(`[Messages Upsert Event] Aviso: erro em getUser`);
         } else if (user === null && remoteJid) {
             await createAndAddUserToGroup({ remoteJid, userName: M.pushName || "S/N" }, from);
         } else if (typeof user !== "boolean" && user.nome === "S/N") {
@@ -50,7 +49,7 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
             });
         }
     } catch (err) {
-        client.log.warn("[Backend offline tolerado] - falha em getUser/updateUser", err);
+        client.log.warn("[Messages Upsert Event]  falha em getUser/updateUser", err);
     }
 
     if (isGroup) {
@@ -61,26 +60,26 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
             if (isCmd) {
                 const result = await UsersService.incrementCommands(target);
                 if (result === false) {
-                    client.log.warn(`[WARN] Usuário ${remoteJid} não cadastrado no grupo. Tentando adicionar...`);
+                    client.log.warn(`[Messages Upsert Event]  Usuário ${remoteJid} não cadastrado no grupo. Tentando adicionar...`);
                     await createAndAddUserToGroup({ remoteJid, userName: M.pushName }, from);
                 } else if (result === null) {
-                    client.log.warn(`[WARN] Backend indisponível para incrementar comandos`);
+                    client.log.warn(`[Messages Upsert Event]  Backend indisponível para incrementar comandos`);
                 } else {
-                    client.log.info(`[OK] Comando incrementado para ${remoteJid}`);
+                    client.log.info(`[Messages Upsert Event]  Comando incrementado para ${remoteJid}`);
                 }
             } else {
                 const result = await UsersService.incrementMessages(target);
                 if (result === false) {
-                    client.log.warn(`[WARN] Usuário ${remoteJid} não cadastrado no grupo. Tentando adicionar...`);
+                    client.log.warn(`[Messages Upsert Event]  Usuário ${remoteJid} não cadastrado no grupo. Tentando adicionar...`);
                     await createAndAddUserToGroup({ remoteJid, userName: M.pushName }, from);
                 } else if (result === null) {
-                    client.log.warn(`[WARN] Backend indisponível para incrementar mensagens`);
+                    client.log.warn(`[Messages Upsert Event]  Backend indisponível para incrementar mensagens`);
                 } else {
-                    client.log.info(`[OK] Mensagem incrementada para ${remoteJid}`);
+                    client.log.info(`[Messages Upsert Event]  Mensagem incrementada para ${remoteJid}`);
                 }
             }
         } catch (err) {
-            client.log.warn(`[Tolerado] Falha ao registrar comando/mensagem: ${err.message}`);
+            client.log.warn(`[Messages Upsert Event]  Falha ao registrar comando/mensagem: ${err.message}`);
         }
     }
 
@@ -127,18 +126,18 @@ export async function MessageUpsertEvent(messages: MessagesUpsertType, client: C
           });
         }
     } catch (err) {
-        client.log.error('[ERRO NO COMANDO] Mesmo sem backend, algo falhou ao executar comando:', err);
+        client.log.error('[Messages Upsert Event] Mesmo sem backend, algo falhou ao executar comando:', err);
     }
 }
 
 async function createAndAddUserToGroup(user: UserRequest, groupId: string): Promise<void> {
     try {
         const newUser = await UsersService.newUser(user);
-        if (!newUser) logger.warn("Usuário já cadastrado ou backend offline");
+        if (!newUser) logger.warn("[Messages Upsert Event] Usuário já cadastrado ou backend offline");
 
         const newGroupUser = await GroupsService.addUserToGroup({ userId: user.remoteJid, groupId });
-        if (!newGroupUser) logger.warn("Usuário já está no grupo ou backend offline");
+        if (!newGroupUser) logger.warn("[Messages Upsert Event] Usuário já está no grupo ou backend offline");
     } catch (err) {
-        logger.warn("[Backend offline tolerado] Erro ao criar/adicionar usuário ao grupo", err);
+        logger.warn("[Messages Upsert Event] Erro ao criar/adicionar usuário ao grupo", err);
     }
 }

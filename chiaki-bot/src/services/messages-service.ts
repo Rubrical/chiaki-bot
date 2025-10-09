@@ -17,7 +17,7 @@ export const MessageService = {
         return await api.get<Message>(routes.getMessage(`${msgType}:${groupName}`))
             .then((data) => data)
             .catch((err) => {
-                logger.error(`${JSON.stringify(err)}`);
+                logger.error(`[Message Service] ${JSON.stringify(err)}`);
                 return null;
             });
     },
@@ -33,7 +33,7 @@ export const MessageService = {
         return await api.patch<Message>(routes.attachMedia(id), form, { headers: form.getHeaders() })
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao enviar mídia para a mensagem: " + JSON.stringify(err));
+                logger.warn("[Message Service] Erro ao enviar mídia para a mensagem: " + JSON.stringify(err));
                 return err.message;
             });
     },
@@ -42,7 +42,7 @@ export const MessageService = {
         const response = await api.get(routes.getMedia(codeMessage), { responseType: 'arraybuffer' });
         return Buffer.from(response);
       } catch (err) {
-        logger.error("Erro ao resgatar mídia: " + JSON.stringify(err));
+        logger.error("[Message Service] Erro ao resgatar mídia: " + JSON.stringify(err));
         return null;
       }
     }

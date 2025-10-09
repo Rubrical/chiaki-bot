@@ -43,7 +43,7 @@ const renameStickerCommand: IChiakiCommand = {
             const stickerBuffer = await addExif(mediaBuffer, packName, authorName);
             await client.sendMessage(M.from, { sticker: stickerBuffer }, { quoted: M });
         } catch (error) {
-            logger.error("Erro ao renomear figurinha:", error);
+            logger.error("[Comandos] Erro ao renomear figurinha:", error);
             await M.reply("❌ Ocorreu um erro ao aplicar os novos dados à figurinha.");
         }
     },

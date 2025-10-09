@@ -7,6 +7,7 @@ import { environment } from '../environments/environment.development';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const backendUrl = environment.backendUrl;
+export const botServerUrl = environment.botServerUrl;
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),

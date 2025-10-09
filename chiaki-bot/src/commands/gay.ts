@@ -72,7 +72,7 @@ const gay: IChiakiCommand = {
             await client.sendMessage(M.from, {
                 text: `Um erro inesperado ocorreu!\nServidor interno fora do ar ou outro erro.\nHorário do erro: ${now.toString()}`,
             });
-            client.log.error(`${JSON.stringify(err)}`);
+            client.log.error(`[Comandos] ${JSON.stringify(err)}`);
         }
     },
 };

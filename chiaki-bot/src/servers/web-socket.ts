@@ -16,14 +16,14 @@ export const io = new SocketServer(server, {
 export const startWebSocket = () => {
     if (!serverStarted) {
         server.listen(3001, "0.0.0.0", () => {
-            logger.info(`Servidor WebSocket rodando na porta 3001!`);
+            logger.info(`[WebSocket] Servidor WebSocket rodando na porta 3001!`);
         });
 
         io.on("connection", (socket) => {
-            logger.info('Cliente conectado ao Socket.io');
+            logger.info('[WebSocket] Cliente conectado ao Socket.io');
 
             socket.on('disconnect', () => {
-                logger.info('Cliente desconectado do Socket.io');
+                logger.info('[WebSocket] Cliente desconectado do Socket.io');
             });
         });
 
@@ -37,7 +37,7 @@ export const stopWebSocket = () => {
     if (serverStarted) {
         io.close();
         server.close(() => {
-            logger.info("Servidor WebSocket foi fechado.");
+            logger.info("[WebSocket] Servidor WebSocket foi fechado.");
         });
         serverStarted = false;
     } else {

@@ -10,7 +10,12 @@ import { getExtensionFromUrl, verifyIfYtDlpIsInstalled } from "../utils/utils";
  */
 export type ChiakiConfig = {
     name: string;
-    prefix: string
+    prefix: string;
+    startTime: string;
+    botRoot: string;
+    environment: string;
+    groupsCount: number;
+    registeredMembers: number;
 }
 /**
  * Socket de comunicação com o Whatsapp do Baileys extendido
@@ -25,10 +30,13 @@ export type ChiakiClient = WASocket & {
     verifyIfYtDlpIsInstalled(): Promise<boolean>;
     validateRemoteJid(remoteJid: string): JidInfo;
     getExtensionFromUrl: (url: string) => string;
+    runningTime: (startTime: Date) => string;
   };
   log: Logger;
   config: ChiakiConfig;
   cmd: Map<string, IChiakiCommand>;
+  startTime: string;
+  botRoot: string;
 };
 
 /**

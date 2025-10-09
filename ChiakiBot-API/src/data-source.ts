@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   type: 'sqlite',
   database: './database/db.sqlite',
   entities: [User, Group, GroupUser, Ban, Message, Root, Advertence],
-  logging: true,
+  logging: ['query', 'error', 'schema', 'warn', 'info'],
   migrations: [InitialSchema1745020942348],
   migrationsTableName: 'migrations',
 });

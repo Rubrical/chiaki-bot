@@ -7,6 +7,7 @@ const { BACKEND_URL } = process.env;
 const { PREFIX } = process.env;
 const { VALKEY_HOST } = process.env;
 const { VALKEY_PASSWORD } = process.env;
+const { BOT_NAME } = process.env;
 
 console.log(BACKEND_URL);
 console.log(PREFIX);

@@ -11,6 +11,7 @@ const routes = {
     getUser: `${url}/get-user`,
     newAdmin: `${url}/admin`,
     updateUser: `${url}/update-user`,
+    getCount: `${url}/get-count`,
 }
 
 
@@ -18,21 +19,21 @@ export const UsersService = {
     newUser: async (user: UserRequest) => {
         return await api.post<UserRequest>(routes.newUser, user)
             .then((createdUser) => {
-                logger.info(`Novo usuário criado: ${JSON.stringify(createdUser)}`);
+                logger.info(`[User Service] Novo usuário criado: ${JSON.stringify(createdUser)}`);
                 return true;
             }).catch((err) => {
-                logger.warn(err.message);
+                logger.warn("[User Service] " + err.message);
                 return false;
             });
     },
     incrementMessages: async (groupUser: GroupUserRequest) => {
         return await api.post<boolean>(routes.incrementMessages, groupUser)
             .then((messages) => {
-                logger.info(`Incremento de mensagens bem-sucessedido`);
+                logger.info(`[User Service] Incremento de mensagens bem-sucessedido`);
                 return messages;
             })
             .catch((err: ChiakiError) => {
-                logger.warn(`Não foi possível aumentar o número de mensagens do usuário.\n ${err}`);
+                logger.warn(`[User Service] Não foi possível aumentar o número de mensagens do usuário.\n ${err}`);
                 if (err.code === 422) return false;
                 return null;
             });
@@ -40,11 +41,11 @@ export const UsersService = {
     incrementCommands: async (groupUser: GroupUserRequest) => {
         return await api.post<boolean>(routes.incrementCommands, groupUser)
             .then((commands) => {
-                logger.info(`Incremento de comandos bem-sucessedido`);
+                logger.info(`[User Service] Incremento de comandos bem-sucessedido`);
                 return commands;
             })
             .catch((err: ChiakiError) => {
-                logger.warn(`Não foi possível aumentar o número de mensagens do usuário.\n ${err}`);
+                logger.warn(`[User Service] Não foi possível aumentar o número de mensagens do usuário.\n ${err}`);
                 if (err.code === 422) return false;
                 return null;
             });
@@ -52,7 +53,7 @@ export const UsersService = {
     newAdmin: async (user: UserRequest) => {
         return await api.post<UserRequest>(routes.newAdmin, user)
             .then((createdUser) => {
-                logger.info(`Novo admin criado: ${JSON.stringify(createdUser)}`);
+                logger.info(`[User Service] Novo admin criado: ${JSON.stringify(createdUser)}`);
                 return createdUser;
             }).catch((err) => {
                 logger.warn(err.message);
@@ -62,10 +63,10 @@ export const UsersService = {
     updateUser: async (updatedUser: UpdatedUserRequest) => {
         return await api.post<UserRequest>(routes.updateUser, updatedUser)
             .then((updatedUser) => {
-                logger.info(`Usuário atualizado: ${JSON.stringify(updatedUser)}`);
+                logger.info(`[User Service] Usuário atualizado: ${JSON.stringify(updatedUser)}`);
                 return updatedUser;
             }).catch((err) => {
-                logger.warn(err.message);
+                logger.warn("[User Service] " + err.message);
                 return null;
             });
     },
@@ -73,11 +74,19 @@ export const UsersService = {
         return await api.get<UserResponse>(`${routes.getUser}/${remoteJid}`)
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(err)
+                logger.warn("[User Service] " + err)
                 if (err.code === 404) return null; //Usuário não cadastrado no banco
                 return false;
             });
-    }
+    },
+    getCount: async () => {
+        return await api.get<number>(routes.getCount)
+            .then((data) => data)
+            .catch((err:ChiakiError) => {
+                logger.warn("[User Service] " + err);
+                return 0;
+            });
+    },
 };
 
 enum UserRoleEnum {

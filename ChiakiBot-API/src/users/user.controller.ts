@@ -57,4 +57,9 @@ export class UserController {
   async updateUserById(@Body() updatedUser: UpdatedUserDto): Promise<User> {
     return await this.userService.updateUser(updatedUser);
   }
+
+  @Get('get-count')
+  async getUsersCount() {
+    return await this.userService.getUsersCount();
+  }
 }

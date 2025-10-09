@@ -77,6 +77,20 @@ export const CacheManager = {
     }
   },
 
+  flushPattern: async (pattern: string): Promise<void> => {
+    const redis = getRedis();
+    const stream = redis.scanStream({
+      match: pattern,
+      count: 100,
+    });
+
+    for await (const keys of stream) {
+      if (Array.isArray(keys) && keys.length > 0) {
+        await redis.del(...keys);
+      }
+    }
+  },
+
   getOrSet: async <T = any>(
     key: string,
     ttlSeconds: number,

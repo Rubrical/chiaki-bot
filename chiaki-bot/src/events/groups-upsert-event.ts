@@ -13,13 +13,13 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
     for (const group of data) {
         const groupId = group.id;
 
-        client.log.info("---- Entrando em um novo grupo ----");
-        client.log.info(JSON.stringify(group.desc));
+        client.log.info("[Groups Upsert Event] Entrando em um novo grupo");
+        client.log.info("[Groups Upsert Event]" + JSON.stringify(group.desc));
 
         try {
             await client.sendMessage(groupId, { text: ` ---> *${client.config.name}* <--- \n REALIZANDO CADASTRO EM UM NOVO GRUPO! \n Olá ${group.subject}👋` });
         } catch (err) {
-            client.log.warn(`[WHATSAPP] Falha ao enviar mensagem de entrada no grupo ${groupId}: ${err?.message}`);
+            client.log.warn(`[Groups Upsert Event] Falha ao enviar mensagem de entrada no grupo ${groupId}: ${err?.message}`);
             continue;
         }
 
@@ -32,7 +32,7 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
                 whatsappGroupId: groupId
             });
         } catch (err) {
-            client.log.warn("[Backend offline tolerado] Erro ao criar grupo");
+            client.log.warn("[Groups Upsert Event] Erro ao criar grupo");
         }
 
         if (newGroup === null) {
@@ -49,7 +49,7 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
                 }
                 await client.sendMessage(groupId, { text: `Grupo Reativado! É bom estar de volta!` });
             } catch (err) {
-                client.log.warn("[Backend offline tolerado] Erro ao reativar grupo");
+                client.log.warn("[Groups Upsert Event] Erro ao reativar grupo");
             }
         }
 
@@ -57,7 +57,7 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
             await client.sendMessage(groupId, { text: `✅ Cadastro do grupo feito com sucesso ` });
             await client.sendMessage(groupId, { text: " ---> Iniciando cadastro dos usuários! <--- " });
         } catch (err) {
-            client.log.warn(`[WHATSAPP] Erro ao enviar mensagens de progresso para ${groupId}: ${err?.message}`);
+            client.log.warn(`[Groups Upsert Event] Erro ao enviar mensagens de progresso para ${groupId}: ${err?.message}`);
         }
 
         for (const user of group.participants) {
@@ -76,13 +76,13 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
                     if (checkIfUserExist === false)
                         await client.sendMessage(groupId, { text: `Um erro inesperado ocorreu cadastrando o usuário @${userJid}` });
                 } catch (err) {
-                    client.log.warn(`[Backend offline tolerado] Falha ao cadastrar usuário ${userJid}`);
+                    client.log.warn(`[Groups Upsert Event] Falha ao cadastrar usuário ${userJid}`);
                 }
 
                 try {
                     await GroupsService.addUserToGroup({ groupId: groupId, userId: userJid });
                 } catch (err) {
-                    client.log.warn(`[Backend offline tolerado] Falha ao associar ${userJid} ao grupo`);
+                    client.log.warn(`[Groups Upsert Event] Falha ao associar ${userJid} ao grupo`);
                 }
             }
         }
@@ -91,7 +91,7 @@ export async function GroupsUpsert(data: GroupMetadata[], client: ChiakiClient):
             await client.sendMessage(groupId, { text: "✅ Cadastro do grupo completo! Bot pronto para uso!" });
             await client.sendMessage(groupId, { text: `➡️ Próximo passo:\n configurar mensagens personalizadas de entrada e saída!\n Utilize o comando ${client.config.prefix}menu para saber mais` });
         } catch (err) {
-            client.log.warn(`[WHATSAPP] Erro ao enviar mensagem final para ${groupId}: ${err?.message}`);
+            client.log.warn(`[Groups Upsert Event] Erro ao enviar mensagem final para ${groupId}: ${err?.message}`);
         }
     }
 }

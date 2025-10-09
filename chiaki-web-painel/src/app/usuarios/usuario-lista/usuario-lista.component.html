@@ -38,20 +38,26 @@
     </table>
 
 
-    <nav class="paginacao">
+    <nav class="paginacao" *ngIf="totalPages > 1">
       <ul class="pagination">
         <li class="page-item" [class.disabled]="pageNumber === 1">
           <a class="page-link pointer" (click)="loadPage(pageNumber - 1)">Anterior</a>
         </li>
 
-        <li class="page-item"
-            *ngFor="let page of [].constructor(totalPages); let i = index"
-            [class.active]="pageNumber === (i + 1)">
-          <a class="page-link pointer" (click)="loadPage(i + 1)">{{ i + 1 }}</a>
-        </li>
+        <ng-container *ngFor="let page of getPages()">
+          <li *ngIf="isNumber(page)"
+              class="page-item"
+              [class.active]="pageNumber === page">
+            <a class="page-link pointer" (click)="loadPage(page)">{{ page }}</a>
+          </li>
+
+          <li *ngIf="isString(page)" class="page-item disabled">
+            <span class="page-link">{{ page }}</span>
+          </li>
+        </ng-container>
 
         <li class="page-item" [class.disabled]="pageNumber === totalPages">
-          <a class="page-link pointer pointer" (click)="loadPage(pageNumber + 1)">Próxima</a>
+          <a class="page-link pointer" (click)="loadPage(pageNumber + 1)">Próxima</a>
         </li>
       </ul>
     </nav>

@@ -34,12 +34,12 @@ export const GroupsService = {
     createNewGroup: async (group: GroupRequest): Promise<Group|boolean|null> => {
         return await api.post<Group>(routes.newGroup(), group)
             .then((data) => {
-                logger.info("Grupo cadastrado com sucesso");
-                logger.info(`${JSON.stringify(data)}`);
+                logger.info("[Group Service] Grupo cadastrado com sucesso");
+                logger.info(`[Group Service] ${JSON.stringify(data)}`);
                 return data;
             })
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao cadastrar novo grupo: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao cadastrar novo grupo: ${JSON.stringify(err)}`);
 
                 if (err.code === 400) return false
                 return null;
@@ -48,52 +48,52 @@ export const GroupsService = {
     updateGroup: async (id: string, updateGroup: GroupRequest): Promise<Group|null> => {
         return await api.post<Group>(routes.updateGroup(id), updateGroup)
             .then((data) => {
-                logger.info("Grupo cadastrado com sucesso");
-                logger.info(`${JSON.stringify(data)}`);
+                logger.info("[Group Service] Grupo cadastrado com sucesso");
+                logger.info(`[Group Service] ${JSON.stringify(data)}`);
                 return data;
             })
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao cadastrar novo grupo: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao cadastrar novo grupo: ${JSON.stringify(err)}`);
                 return null;
             });
     },
     inactivateGroup: async (id: string): Promise<Group|null> => {
         return await api.post<Group>(routes.inactivateGroup(id))
             .then((data) => {
-                logger.info("Grupo inativado");
-                logger.info(`${JSON.stringify(data)}`);
+                logger.info("[Group Service] Grupo inativado");
+                logger.info(`[Group Service] ${JSON.stringify(data)}`);
                 return data;
             })
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao inativar grupo");
-                logger.warn(`${JSON.stringify(err)}`);
+                logger.warn("[Group Service] Erro ao inativar grupo");
+                logger.warn(`[Group Service] ${JSON.stringify(err)}`);
                 return null;
             });
     },
     reactivateGroup: async (id: string): Promise<Group|null> => {
         return await api.patch<Group>(routes.reactivateGroup(id))
             .then((data) => {
-                logger.info("Grupo reativado");
-                logger.info(`${JSON.stringify(data)}`);
+                logger.info("[Group Service] Grupo reativado");
+                logger.info(`[Group Service] ${JSON.stringify(data)}`);
                 return data;
             })
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao reativar grupo");
-                logger.warn(`${JSON.stringify(err)}`);
+                logger.warn("[Group Service] Erro ao reativar grupo");
+                logger.warn(`[Group Service] ${JSON.stringify(err)}`);
                 return null;
             });
     },
     addUserToGroup: async (data: UserToGroupRequest): Promise<boolean|null> => {
         return await api.post<GroupUser>(routes.addUserToGroup(), data)
             .then((data) => {
-                logger.info(`Novo usuário no grupo **${data.grupo.nomeGrupo}**`);
-                logger.info(`${JSON.stringify(data)}`);
+                logger.info(`[Group Service] Novo usuário no grupo **${data.grupo.nomeGrupo}**`);
+                logger.info(`[Group Service] ${JSON.stringify(data)}`);
 
                 return true;
             })
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao adicionar usuário a grupo");
-                logger.warn(`${JSON.stringify(err)}`);
+                logger.warn("[Group Service] Erro ao adicionar usuário a grupo");
+                logger.warn(`[Group Service] ${JSON.stringify(err)}`);
 
                 if (err.code === 409) return false;
 
@@ -103,24 +103,24 @@ export const GroupsService = {
     inactivateUserFromGroup: async (data: UserToGroupRequest): Promise<GroupUser|null> => {
         return await api.put<GroupUser>(routes.inactivateUserFromGroup(), data)
             .then((data) => {
-                logger.info(`Usuário ${data.usuario.remoteJid} acaba de sair do grupo ${data.grupo.nomeGrupo}`);
+                logger.info(`[Group Service] Usuário ${data.usuario.remoteJid} acaba de sair do grupo ${data.grupo.nomeGrupo}`);
                 return data;
             })
             .catch((err) => {
-                logger.warn("Erro ao remover usuário do grupo");
-                logger.warn(`${JSON.stringify(err)}`);
+                logger.warn("[Group Service] Erro ao remover usuário do grupo");
+                logger.warn(`[Group Service] ${JSON.stringify(err)}`);
                 return null;
             })
     },
     reactivateUserFromGroup: async (data: UserToGroupRequest): Promise<GroupUser|null> => {
         return await api.put<GroupUser>(routes.reactivateUserFromGroup(), data)
             .then((data) => {
-                logger.info(`Usuário ${data.usuario.remoteJid} acaba de voltar pro grupo ${data.grupo.nomeGrupo}`);
+                logger.info(`[Group Service] Usuário ${data.usuario.remoteJid} acaba de voltar pro grupo ${data.grupo.nomeGrupo}`);
                 return data;
             })
             .catch((err) => {
-                logger.warn("Erro ao reativar usuário do grupo");
-                logger.warn(`${JSON.stringify(err)}`);
+                logger.warn("[Group Service] Erro ao reativar usuário do grupo");
+                logger.warn(`[Group Service] ${JSON.stringify(err)}`);
                 return null;
             });
     },
@@ -131,7 +131,7 @@ export const GroupsService = {
                 return data;
             })
             .catch((err: ChiakiError) => {
-                logger.warn(`Houve um erro: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Houve um erro: ${JSON.stringify(err)}`);
                 return err.message;
             });
     },
@@ -144,7 +144,7 @@ export const GroupsService = {
         return await api.get<UsersRank>(routes.getMostActiveMembers(id, qty))
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(`Um erro ocorreu ao buscar o rank ${err}`);
+                logger.warn(`[Group Service] Um erro ocorreu ao buscar o rank ${err}`);
                 return err.message;
             });
     },
@@ -153,7 +153,7 @@ export const GroupsService = {
         return await api.patch<string>(routes.activateWelcome(groupId))
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao ativar mensagem de boas vindas: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao ativar mensagem de boas vindas: ${JSON.stringify(err)}`);
                 return err.message;
             });
     },
@@ -161,7 +161,7 @@ export const GroupsService = {
         return await api.patch<string>(routes.inactivateWelcome(groupId))
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao desativar mensagem de boas vindas: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao desativar mensagem de boas vindas: ${JSON.stringify(err)}`);
                 return err.message;
             });
     },
@@ -169,7 +169,7 @@ export const GroupsService = {
         return await api.patch<string>(routes.activateGoodbye(groupId))
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao ativar mensagem de despedidas: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao ativar mensagem de despedidas: ${JSON.stringify(err)}`);
                 return err.message;
             });
     },
@@ -177,7 +177,7 @@ export const GroupsService = {
         return await api.patch<string>(routes.inactivateGoodbye(groupId))
         .then((data) => data)
         .catch((err: ChiakiError) => {
-            logger.warn(`Erro ao desativar mensagem de despedidas: ${JSON.stringify(err)}`);
+            logger.warn(`[Group Service] Erro ao desativar mensagem de despedidas: ${JSON.stringify(err)}`);
             return err.message;
         });
     },
@@ -186,7 +186,7 @@ export const GroupsService = {
         return await api.get<MessagesStatus>(routes.checkMessagesStatus(groupId))
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn(`Erro ao ativar mensagem de despedidas: ${JSON.stringify(err)}`);
+                logger.warn(`[Group Service] Erro ao ativar mensagem de despedidas: ${JSON.stringify(err)}`);
                 return err.message;
             });
     },
@@ -194,7 +194,7 @@ export const GroupsService = {
         return await api.patch<Message>(routes.editWelcomeMessage(), message)
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao atualizar mensagem de grupo");
+                logger.warn("[Group Service] Erro ao atualizar mensagem de grupo");
                 return err.message;
             });
     },
@@ -202,7 +202,7 @@ export const GroupsService = {
         return await api.patch<Message>(routes.editGoodbyeMessage(), message)
             .then((data) => data)
             .catch((err: ChiakiError) => {
-                logger.warn("Erro ao atualizar mensagem de grupo");
+                logger.warn("[Group Service] Erro ao atualizar mensagem de grupo");
                 return err.message;
             });
     },

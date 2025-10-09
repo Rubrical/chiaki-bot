@@ -57,7 +57,7 @@ export async function safeDownloadMedia(
 
     return Buffer.concat(bufferArray);
   } catch (error) {
-    logger.error(`Erro ao baixar mídia: ${JSON.stringify(error)}`);
+    logger.error(`[Comandos] Erro ao baixar mídia: ${JSON.stringify(error)}`);
     return Buffer.from([]);
   }
 }
@@ -82,20 +82,20 @@ const stickerCommand: IChiakiCommand = {
 
   async execute(client, flag, arg, M) {
     const tempDir = ensureTempDir();
-    logger.info("Executando comando de sticker...");
+    logger.info("[Comandos] Executando comando de sticker...");
 
     await M.reply("⏱️ Aguarde a criação do seu sticker").catch(e =>
-      logger.warn("Erro ao enviar mensagem de espera: ", JSON.stringify(e))
+      logger.warn("[Comandos] Erro ao enviar mensagem de espera: ", JSON.stringify(e))
     );
 
     const mediaMessage = M.quoted?.message || M.message;
     const actualType = getContentType(mediaMessage) ?? "";
     const supportedTypes = ["imageMessage", "videoMessage", "stickerMessage"];
 
-    logger.info("Tipo detectado da mídia:", actualType);
+    logger.info("[Comandos] Tipo detectado da mídia:", actualType);
 
     if (!supportedTypes.includes(actualType)) {
-      logger.warn("Tipo de mídia não suportado:", actualType);
+      logger.warn("[Comandos] Tipo de mídia não suportado:", actualType);
       return M.reply("❌ *Envie ou marque uma imagem, vídeo ou GIF*.");
     }
 
@@ -105,7 +105,7 @@ const stickerCommand: IChiakiCommand = {
     const mediaBuffer = await safeDownloadMedia(M.quoted ?? M);
 
     if (!mediaBuffer || mediaBuffer.length === 0) {
-      logger.warn("Buffer vazio ou mídia indisponível para download");
+      logger.warn("[Comandos] Buffer vazio ou mídia indisponível para download");
       return M.reply("❌ Não consegui baixar a mídia. Talvez tenha expirado ou sido apagada.");
     }
 
@@ -118,13 +118,13 @@ const stickerCommand: IChiakiCommand = {
       });
 
       await client.sendMessage(M.from, { sticker: stickerBuffer }, { quoted: M });
-      logger.info("Figurinha enviada com sucesso.");
+      logger.info("[Comandos] Figurinha enviada com sucesso.");
     } catch (error: any) {
       if (error instanceof StickerError) {
-        logger.warn(`Erro específico de figurinha: ${JSON.stringify(error)}`);
+        logger.warn(`[Comandos] Erro específico de figurinha: ${JSON.stringify(error)}`);
         await M.reply(`${error.message}`);
       } else {
-        logger.error("Erro na criação do sticker:", error);
+        logger.error("[Comandos] Erro na criação do sticker:", error);
         await M.reply("❌ Ocorreu um erro ao criar a figurinha. Tente novamente.");
       }
     }

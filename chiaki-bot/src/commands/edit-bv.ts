@@ -14,8 +14,6 @@ const editBv: IChiakiCommand = {
         const newMessage = arg.trim();
         const groupId = M.from;
 
-        console.log(M.from);
-
         if (!newMessage) {
             await M.reply("❗ Você precisa informar a nova mensagem de boas-vindas.");
             return;

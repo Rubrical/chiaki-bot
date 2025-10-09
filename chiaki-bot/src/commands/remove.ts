@@ -20,7 +20,7 @@ const remove: IChiakiCommand = {
       await M.reply("🟥 *Você só pode remover até 5 usuários por vez!*");
       return;
     }
-    client.log.info(`Administrador ${M.from} está removendo os seguintes usuários: ${mentions}`);
+    client.log.info(`[Comandos] Administrador ${M.from} está removendo os seguintes usuários: ${mentions}`);
 
     await client.groupParticipantsUpdate(M.from, mentions, "remove");
     await M.reply(`🟩 *Pronto! Removendo ${mentions.length} usuários*`);

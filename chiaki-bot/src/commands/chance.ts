@@ -74,7 +74,7 @@ const chance: IChiakiCommand = {
         {
           text: `Um erro inesperado ocorreu!\n Servidor interno fora do ar ou outro erro.\n Horário do erro ${now.toString()}`
         });
-      client.log.error(`${JSON.stringify(err)}`);
+      client.log.error(`[Comandos] ${JSON.stringify(err)}`);
     }
   },
 };

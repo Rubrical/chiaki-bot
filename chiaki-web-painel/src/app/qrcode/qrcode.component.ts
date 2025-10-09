@@ -4,6 +4,8 @@ import { environment } from '../../environments/environment';
 import { ToastType } from '../shared/toast/toast.component';
 import { VoltarComponent } from '../shared/voltar/voltar.component';
 import { ToastService } from '../shared/services/toast.service';
+import { BotServerService } from '../shared/services/bot-server.service';
+import { BotStatusData } from '../shared/models/bot-status';
 
 @Component({
   selector: 'app-qrcode',
@@ -14,16 +16,31 @@ import { ToastService } from '../shared/services/toast.service';
 })
 export class QrcodeComponent implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
+  private botServerService = inject(BotServerService)
   private socket: Socket;
   isConnected: boolean = false;
   qrCode: string | null = null;
   qrImageUrl: string = '';
+  botData: BotStatusData | null = null;
 
   constructor() {
     this.socket = io(environment.socketUrl);
   }
 
+  private callBotStatus() {
+    this.botServerService.botStatus().subscribe({ next: data => {
+        console.log(data);
+        this.botData = data;
+      },
+      error: err => {
+        this.toastService.warning("Não foi possivel resgatar as informações do bot");
+        console.error(err);
+      }
+    });
+  }
+
   ngOnInit(): void {
+    this.callBotStatus();
     this.socket.on("connect", () => {
       this.isConnected = true;
     });
@@ -51,4 +68,19 @@ export class QrcodeComponent implements OnInit, OnDestroy {
     }
   }
 
+  disconnectBot(): void {
+    this.botServerService.disconnectBot().subscribe({ next: data => {
+        if (data.success === true) {
+          this.toastService.success(data.message);
+        }
+        else {
+          this.toastService.error("Um erro ocorreu");
+        }
+      },
+      error: (error: any) => {
+        this.toastService.error("Um erro ocorreu e não foi possível desconectar o bot");
+        console.error(error);
+      }
+    });
+  }
 }

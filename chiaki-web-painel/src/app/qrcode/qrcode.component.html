@@ -13,3 +13,46 @@
     <h2>Bot Conectado</h2>
   }
 </div>
+
+<div class="container container-md mt-4">
+  <div class="painel-container justify-content-center">
+    <h2>Informações do Bot</h2>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Nome do Bot</li>
+      <li class="list-group-item flex-fill">{{ botData?.name }}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Dono do Bot</li>
+      <li class="list-group-item flex-fill">{{ botData?.botRoot}}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Ambiente de produção</li>
+      <li class="list-group-item flex-fill">{{ botData?.environment}}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Prefixo</li>
+      <li class="list-group-item flex-fill">{{ botData?.prefix }}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Hora de inicialização</li>
+      <li class="list-group-item flex-fill">{{ botData?.startTime }}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Tempo de execução</li>
+      <li class="list-group-item flex-fill">{{ botData?.runningTime }}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Contagem de grupos</li>
+      <li class="list-group-item flex-fill">{{ botData?.groupsCount}}</li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item gray-background">Contagem de usuários</li>
+      <li class="list-group-item flex-fill">{{ botData?.registeredMembers }}</li>
+    </ul>
+  </div>
+</div>
+
+<div class="container mt-4 mb-5 d-grid gap-2">
+  <h2>Desconectar Bot</h2>
+  <button class="btn btn-outline-primary" (click)="disconnectBot()">Desconectar bot</button>
+</div>

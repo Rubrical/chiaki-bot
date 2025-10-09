@@ -1,0 +1,25 @@
+<app-voltar />
+<div class="auth-container">
+  <form [formGroup]="sendMessageForm" (ngSubmit)="submitMessage()">
+    <div class="form-group">
+      <label for="to">Número de destino</label>
+      <input type="text" id="to" formControlName="to">
+      <div class="error" *ngIf="sendMessageForm.get('to')?.invalid && sendMessageForm.get('to')?.touched">
+        Número de destino é obrigatório
+      </div>
+      <div class="label-message">Exemplo: 5511999999999 (tudo junto sem símbolos)</div>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Mensagem</label>
+      <input type="text" formControlName="message">
+      <div class="error" *ngIf="sendMessageForm.get('message')?.invalid && sendMessageForm.get('message')?.touched">
+        Escreva sua mensagem
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="sendMessageForm.invalid">
+      Enviar mensagem
+    </button>
+  </form>
+</div>

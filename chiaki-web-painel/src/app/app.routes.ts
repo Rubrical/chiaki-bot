@@ -106,6 +106,11 @@ export const routes: Routes = [
     path: 'editar-administrador',
     loadComponent: () => import("./root/root.component").then(c => c.RootComponent),
   },
+  {
+    path: "enviar-mensagem-privada",
+    loadComponent: () => import("./send-message/send-message.component").then(c => c.SendMessageComponent),
+    canActivate: [authGuard]
+  },
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
   { path: '**', redirectTo: '/auth' },
 ];

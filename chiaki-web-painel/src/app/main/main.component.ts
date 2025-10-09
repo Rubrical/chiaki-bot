@@ -19,6 +19,7 @@ export class MainComponent implements OnInit {
     { label: 'Usuários', route: 'usuario/usuario-lista'},
     { label: 'Advertências', route: 'advertencia/advertencia-lista' },
     { label: 'Bans', route: 'bans/ban-lista' },
+    { label: 'Enviar Mensagem', route: 'enviar-mensagem-privada' },
     { label: 'Mensagens', route: 'mensagens/mensagem-lista' },
     { label: 'Editar Login', route: 'editar-administrador' },
     { label: 'Sair', route: '/auth' },

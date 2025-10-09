@@ -16,7 +16,10 @@ export const startWebServer = (client: ChiakiClient) => {
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-        if (req.method === "OPTIONS") res.sendStatus(204);
+        if (req.method === "OPTIONS") {
+            res.sendStatus(204);
+            return;
+        }
 
         next();
     });

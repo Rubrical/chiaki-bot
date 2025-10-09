@@ -19,31 +19,21 @@ import { sleep } from './utils/sleep';
 import { GroupsService } from './services/group-service';
 import { UsersService } from './services/user-service';
 
-const programStartTime = new Date();
+export const programStartTime = new Date();
+const startTime = new Date().toLocaleDateString('pt-BR', {
+  timeZone: "America/Sao_Paulo",
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit',
+  hour12: false
+});
 
 async function getConfig(): Promise<ChiakiConfig> {
- const uptimeMs = new Date().getTime() - programStartTime.getTime();
-  let seconds = Math.floor(uptimeMs / 1000);
-  let minutes = Math.floor(seconds / 60);
-  let hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  seconds %= 60;
-  minutes %= 60;
-  hours %= 24;
-
   return {
       name: process.env.BOT_NAME || 'ChiakiBot',
       prefix: process.env.PREFIX || '/',
-      startTime: new Date().toLocaleDateString('pt-BR', {
-        timeZone: "America/Sao_Paulo",
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: false
-      }),
+      startTime: startTime,
       botRoot: await RootService.getRootName(),
       environment: `${process.env.BOT_NAME ?? "ChiakiBot"} powered by\n Docker🐋 & Node｡🇯‌🇸‌ `,
-      runningTime: `Running for: ${days}d ${hours}h ${minutes}m ${seconds}s`,
       groupsCount: await GroupsService.allGroupsCount(),
       registeredMembers: await UsersService.getCount(),
   }
@@ -80,6 +70,8 @@ const start = async (): Promise<ChiakiClient | void> => {
   client.config = await getConfig();
   client.cmd = new Map();
   client.log = logger;
+  client.botRoot = client.config.botRoot;
+  client.startTime = startTime;
 
   logger.info("[init] registrando eventos");
   client.ev.on('creds.update', saveCreds);
@@ -116,4 +108,4 @@ const start = async (): Promise<ChiakiClient | void> => {
   return client;
 };
 
-start().catch(err => logger.error(err));
+start().catch(err => logger.error(`${JSON.stringify(err)}`));

@@ -3,6 +3,7 @@ import { ChiakiClient } from '../types/types';
 import logger from '../logger';
 import { CacheManager } from '../adapters/cache';
 import { sleep } from '../utils/sleep';
+import { programStartTime } from '../main';
 
 export const startWebServer = (client: ChiakiClient) => {
     const app: Express = express();
@@ -11,12 +12,20 @@ export const startWebServer = (client: ChiakiClient) => {
     app.use(express.json());
     app.use((req, res, next) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        if (req.method === "OPTIONS") res.sendStatus(204);
 
         next();
     });
     app.get('/status', (req: Request, res: Response) => {
-        res.status(200).json(client.config);
+        const startTime = client.utils.runningTime(programStartTime);
+        res.status(200).json({
+            runningTime: startTime,
+            ...client.config,
+        });
     });
 
     app.post('/send-private-message', async (req, res) => {

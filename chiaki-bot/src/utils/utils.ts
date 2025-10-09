@@ -55,3 +55,17 @@ export const validateRemoteJid = (remoteJid: string): JidInfo => {
 }
 
 export const getExtensionFromUrl = (url: string): string => url.split(".").pop()?.toLowerCase() || "";
+
+export const runningTime = (startDate: Date) => {
+  const uptimeMs = new Date().getTime() - startDate.getTime();
+  let seconds = Math.floor(uptimeMs / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  seconds %= 60;
+  minutes %= 60;
+  hours %= 24;
+
+  return `Running for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+}

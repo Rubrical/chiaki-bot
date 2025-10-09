@@ -12,7 +12,6 @@ export type ChiakiConfig = {
     name: string;
     prefix: string;
     startTime: string;
-    runningTime: string;
     botRoot: string;
     environment: string;
     groupsCount: number;
@@ -31,6 +30,7 @@ export type ChiakiClient = WASocket & {
     verifyIfYtDlpIsInstalled(): Promise<boolean>;
     validateRemoteJid(remoteJid: string): JidInfo;
     getExtensionFromUrl: (url: string) => string;
+    runningTime: (startTime: Date) => string;
   };
   log: Logger;
   config: ChiakiConfig;

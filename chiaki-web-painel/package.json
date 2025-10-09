@@ -1,6 +1,6 @@
 {
   "name": "chiaki-web-painel",
-  "version": "1.0.0",
+  "version": "1.3.6",
   "author": "Filipe Salviano",
   "scripts": {
     "ng": "ng",

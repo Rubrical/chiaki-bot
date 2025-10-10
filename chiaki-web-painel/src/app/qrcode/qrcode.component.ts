@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { io, Socket } from "socket.io-client";
 import { environment } from '../../environments/environment';
-import { ToastType } from '../shared/toast/toast.component';
 import { VoltarComponent } from '../shared/voltar/voltar.component';
 import { ToastService } from '../shared/services/toast.service';
 import { BotServerService } from '../shared/services/bot-server.service';
 import { BotStatusData } from '../shared/models/bot-status';
+import * as bootstrap from "bootstrap";
 
 @Component({
   selector: 'app-qrcode',
@@ -53,7 +53,7 @@ export class QrcodeComponent implements OnInit, OnDestroy {
       this.isConnected = false;
       this.socket.disconnect();
 
-      this.toastService.error("Erro ao se comunicar com o servidor", 8000);
+      this.toastService.error("Servidor de conexão desconectado", 8000);
     });
 
     this.socket.on('qr', (qrString: string) => {
@@ -72,6 +72,8 @@ export class QrcodeComponent implements OnInit, OnDestroy {
     this.botServerService.disconnectBot().subscribe({ next: data => {
         if (data.success === true) {
           this.toastService.success(data.message);
+          this.closeModal();
+          setTimeout(() => window.location.reload(), 2000);
         }
         else {
           this.toastService.error("Um erro ocorreu");
@@ -79,8 +81,23 @@ export class QrcodeComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         this.toastService.error("Um erro ocorreu e não foi possível desconectar o bot");
+        this.closeModal();
         console.error(error);
       }
     });
+  }
+
+  private closeModal(): void {
+    const modalElement = document.getElementById('confirmDisconnectModal');
+    if (modalElement) {
+      const modalInstance = bootstrap.Modal.getInstance(modalElement)
+        || new bootstrap.Modal(modalElement);
+      modalInstance.hide();
+
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(b => b.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+    }
   }
 }

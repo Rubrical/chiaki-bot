@@ -4,6 +4,7 @@ import logger from '../logger';
 import { CacheManager } from '../adapters/cache';
 import { sleep } from '../utils/sleep';
 import { programStartTime } from '../main';
+import { safeLogout } from '../utils/safe-logout';
 
 export const startWebServer = (client: ChiakiClient) => {
     const app: Express = express();
@@ -55,12 +56,12 @@ export const startWebServer = (client: ChiakiClient) => {
 
     app.post('/disconnect-bot', async (req, res) => {
         try {
-            await client.logout();
-            await CacheManager.flushPattern("chiaki:auth*");
-            logger.info("[Bot-Server] limpando conexão");
-
-            await sleep(5000);
-            res.status(200).json({ success: true, message: 'Sessão limpa com sucesso' });
+            const ok = await safeLogout(client);
+            if (ok) {
+                res.status(200).json({ success: true, message: "Sessão encerrada com sucesso" });
+            } else {
+                res.status(500).json({ success: false, message: "Erro ao encerrar sessão" });
+            }
         } catch(err) {
             logger.warn("[Bot-Server] Ocorreu um erro ao desconectar o bot");
             logger.warn(`[Bot-Server] ${JSON.stringify(err)}`);

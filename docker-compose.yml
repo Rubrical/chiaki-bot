@@ -35,7 +35,7 @@ services:
     restart: always
 
   chiaki-web-panel:
-    image: chiaki-web-painel:latest
+    image: ghcr.io/rubrical/chiaki-web-painel:latest
     container_name: chiaki-web-painel
     build:
       context: ./chiaki-web-painel

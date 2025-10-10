@@ -12,7 +12,7 @@
 
     <div class="form-group">
       <label for="message">Mensagem</label>
-      <input type="text" formControlName="message">
+      <textarea class="form-control" formControlName="message"></textarea>
       <div class="error" *ngIf="sendMessageForm.get('message')?.invalid && sendMessageForm.get('message')?.touched">
         Escreva sua mensagem
       </div>

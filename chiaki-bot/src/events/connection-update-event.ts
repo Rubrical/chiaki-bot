@@ -36,6 +36,9 @@ export async function ConnectionUpdateEvent(
         if (!client.cmd || client.cmd.size === 0 ) {
             client.log.info("[Connection Update Event] Carregando comandos");
             loadCommands(client);
+            const { setupWorker } = await import("./../jobs/worker");
+            logger.info("[init] iniciado worker de comandos")
+            await setupWorker(client);
         } else {
             client.log.info("[Connection Update Event] comandos já carregados");
         }

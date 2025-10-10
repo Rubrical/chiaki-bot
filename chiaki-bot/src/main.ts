@@ -101,8 +101,6 @@ const start = async (): Promise<ChiakiClient | void> => {
     logger.error(JSON.stringify(e));
   }
 
-  logger.info("[init] iniciado worker de comandos")
-  await setupWorker(client);
   setInterval(AdvertenceService.cleanAll, sevenDays);
 
   return client;

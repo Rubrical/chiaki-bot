@@ -54,5 +54,42 @@
 
 <div class="container mt-4 mb-5 d-grid gap-2">
   <h2>Desconectar Bot</h2>
-  <button class="btn btn-outline-primary" (click)="disconnectBot()">Desconectar bot</button>
+  <button
+    class="btn btn-outline-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#confirmDisconnectModal">
+    Desconectar bot
+  </button>
+</div>
+
+
+<div
+  class="modal fade"
+  id="confirmDisconnectModal"
+  tabindex="-1"
+  aria-labelledby="confirmDisconnectLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDisconnectLabel">Confirmar desconexão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que deseja desconectar o bot?
+        Essa ação encerrará a sessão atual.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="disconnectBot()">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

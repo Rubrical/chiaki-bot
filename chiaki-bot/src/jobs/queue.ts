@@ -20,6 +20,11 @@ export const addCommandJob = async (job: ICommandJob): Promise<void> => {
 
   await commandQueue.add('process-command', job, {
     removeOnComplete: true,
-    removeOnFail: 5000,
+    removeOnFail: false,
+    attempts: 3,
+    backoff: {
+      delay: 1000,
+      type: "exponential",
+    },
   });
 };

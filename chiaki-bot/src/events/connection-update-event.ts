@@ -8,7 +8,6 @@ import { sleep } from "../utils/sleep";
 import { CacheManager } from "../adapters/cache";
 
 let attempts = 0;
-let restarting = false;
 let presenceInterval: NodeJS.Timeout | undefined;
 const MAX_ATTEMPTS = 15;
 const isBoom = (err: unknown): err is Boom => {
@@ -30,7 +29,6 @@ export async function ConnectionUpdateEvent(
 
   if (connection === "open") {
     attempts = 0;
-    restarting = false;
     io.emit("status", "online");
     stopWebSocket();
 
@@ -84,16 +82,11 @@ export async function ConnectionUpdateEvent(
       case DisconnectReason.timedOut:
       case 428:
       case 515:
-        if (restarting) {
-          logger.warn("[Connection] Reinício já em andamento. Ignorando sinal extra.");
-          process.exit(1);
-        }
         if (attempts >= MAX_ATTEMPTS) {
           logger.error("[Connection] Limite de tentativas atingido. Abortando.");
           process.exit(1);
         }
 
-        restarting = true;
         attempts += 1;
 
         const backoff = Math.min(250 * attempts, 3000);
@@ -105,9 +98,8 @@ export async function ConnectionUpdateEvent(
           await startFn();
         } catch (err) {
           logger.error(`[Connection] Falha ao reiniciar: ${(err as Error).message}`);
-        } finally {
-          restarting = false;
         }
+
         return;
 
       default:

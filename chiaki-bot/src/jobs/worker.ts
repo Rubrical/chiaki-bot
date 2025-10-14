@@ -16,12 +16,19 @@ export async function setupWorker(client: ChiakiClient) {
       logger.info(`[WORKER] Processando job: ${commandName} de ${rawMessage.key.remoteJid}`);
 
       const command = Array.from(
-          client.cmd.values()).find((cmd) => cmd.command.name === commandName
+        client.cmd.values()).find((cmd) => cmd.command.name === commandName
       );
 
       if (!command) {
         logger.error(`[WORKER] Comando "${commandName}" não encontrado no worker. O job falhará.`);
+        await client.sendMessage(rawMessage.key.remoteJid, {text: "Comando não encontrado"});
         throw new Error(`Comando não encontrado: ${commandName}`);
+      }
+
+      if (!client.user) {
+        logger.warn(`[WORKER] Bot desconectado. Reenfileirando "${commandName}" em 3seg`);
+        await job.moveToDelayed(Date.now() + 3000);
+        return;
       }
 
       try {
@@ -32,6 +39,7 @@ export async function setupWorker(client: ChiakiClient) {
         logger.info(`[WORKER] Job ${commandName} concluído com sucesso.`);
       } catch (error) {
         logger.error(`[WORKER] Erro ao executar o comando "${commandName}" do job:`, error);
+        await client.sendMessage(rawMessage.key.remoteJid, { text: "Ocorreu um erro ao executar o comando. Tentarei novamente em alguns segundos"})
         throw error;
       }
     },

@@ -1,4 +1,4 @@
-import makeWASocket from '@whiskeysockets/baileys';
+import makeWASocket, { makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
 import P from 'pino';
 import logger from './logger';
 import * as utils from './utils/utils';
@@ -10,7 +10,6 @@ import { GroupsUpsert } from './events/groups-upsert-event';
 import { GroupsUpdate } from './events/groups-update-event';
 import { AdvertenceService } from './services/advertence-service';
 import { CacheManager } from "./adapters/cache";
-import { setupWorker } from "./jobs/worker";
 import { chiakiCustomAuth } from './adapters/chiaki-custom-auth';
 import { startWebSocket } from './servers/web-socket';
 import { RootService } from './services/root-service';
@@ -40,7 +39,7 @@ async function getConfig(): Promise<ChiakiConfig> {
 }
 
 const start = async (): Promise<ChiakiClient | void> => {
-  // lazy start for better backend accesss
+  // lazy start for better backend access
   await sleep(15_000);
 
   logger.info("[init] criando redis conexão");
@@ -54,9 +53,13 @@ const start = async (): Promise<ChiakiClient | void> => {
   let client: ChiakiClient;
   try {
     client = makeWASocket({
-      auth: state,
+      auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, P({ level: "info" }) )},
       logger: P({ level: 'silent' }),
       qrTimeout: 20_000,
+      keepAliveIntervalMs: 15_000,
+      connectTimeoutMs: 90_000,
+      markOnlineOnConnect: false,
+      browser: ["Chrome", "Linux", "121"],
       shouldSyncHistoryMessage: () => false,
       cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
     }) as ChiakiClient;

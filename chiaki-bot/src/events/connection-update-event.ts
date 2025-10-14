@@ -86,7 +86,7 @@ export async function ConnectionUpdateEvent(
       case 515:
         if (restarting) {
           logger.warn("[Connection] Reinício já em andamento. Ignorando sinal extra.");
-          return;
+          process.exit(1);
         }
         if (attempts >= MAX_ATTEMPTS) {
           logger.error("[Connection] Limite de tentativas atingido. Abortando.");

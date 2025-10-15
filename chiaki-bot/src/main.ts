@@ -1,4 +1,4 @@
-import makeWASocket, { makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
+import makeWASocket, { fetchLatestWaWebVersion, makeCacheableSignalKeyStore } from '@whiskeysockets/baileys';
 import P from 'pino';
 import logger from './logger';
 import * as utils from './utils/utils';
@@ -17,6 +17,8 @@ import { startWebServer } from './servers/bot-web-server';
 import { sleep } from './utils/sleep';
 import { GroupsService } from './services/group-service';
 import { UsersService } from './services/user-service';
+import { AxiosRequestConfig } from 'axios';
+import { createWinstonAdapter } from './adapters/logger-adapter';
 
 export const programStartTime = new Date();
 const startTime = new Date().toLocaleDateString('pt-BR', {
@@ -52,14 +54,22 @@ const start = async (): Promise<ChiakiClient | void> => {
   logger.info("[init] criando socket Baileys");
   let client: ChiakiClient;
   try {
+    logger.info("[init] Buscando versão mais recente do WA");
+
+    const fetchOptions: AxiosRequestConfig = { timeout: 10_000 };
+    const {version, isLatest} = await fetchLatestWaWebVersion(fetchOptions);
+    const customSocketLogger = createWinstonAdapter(logger);
+
+    logger.info(`[init] versão encontrada: ${version.join('.')} - É a mais recente? ${isLatest}`);
+
     client = makeWASocket({
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, P({ level: "info" }) )},
-      logger: P({ level: 'silent' }),
       qrTimeout: 20_000,
       keepAliveIntervalMs: 15_000,
       connectTimeoutMs: 90_000,
       markOnlineOnConnect: false,
-      browser: ["Chrome", "Linux", "121"],
+      version: version,
+      logger: customSocketLogger,
       shouldSyncHistoryMessage: () => false,
       cachedGroupMetadata: async (jid) => CacheManager.get(`groups:${jid}`)
     }) as ChiakiClient;

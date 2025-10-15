@@ -71,8 +71,10 @@ export async function ConnectionUpdateEvent(
       case DisconnectReason.loggedOut:
       case DisconnectReason.badSession:
       case DisconnectReason.multideviceMismatch:
+      case 405:
         logger.error("[Connection] Sessão inválida. Limpando Redis e aguardando novo QR.");
         await CacheManager.flushPattern("chiaki:auth*");
+        await client.logout();
         await sleep(1000);
         await startFn();
         return;

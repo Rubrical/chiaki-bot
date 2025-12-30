@@ -35,13 +35,13 @@ services:
     restart: always
 
   chiaki-web-panel:
-    image: ghcr.io/rubrical/chiaki-web-painel:latest
+    image: chiaki-web-painel:latest
     container_name: chiaki-web-painel
     build:
       context: ./chiaki-web-painel
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8069:80"
     restart: always
 
   valkey:

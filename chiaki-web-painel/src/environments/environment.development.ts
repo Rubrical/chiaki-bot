@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
   backendUrl: `/api`,
-  socketUrl: `/socket`,
+  socketUrl: ``,
   botServerUrl: `/bot`,
 };
